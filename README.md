@@ -1,76 +1,297 @@
-<div align="center">
-  <h1>🤖 Dexmate Robot Control and Sensing API</h1>
-</div>
+<!--
+Copyright (C) 2026 Dexmate Inc.
 
-![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue)
+This software is dual-licensed:
 
-## 📦 Installation
+1. GNU Affero General Public License v3.0 (AGPL-3.0)
+   See LICENSE-AGPL for details
 
-```shell
-pip install dexcontrol
+2. Commercial License
+   For commercial licensing terms, contact: contact@dexmate.ai
+-->
+
+# DexControl
+
+Control Dexmate robots from Python, C++, or Rust. Read joint positions, move
+joints, use named poses, and monitor robot state through a shared robot API.
+
+The examples below use a simulated `vega_1`. They run without a connected robot.
+Joint angles are in radians; timeouts are in seconds.
+
+## Get the examples
+
+Download a release from [GitHub Releases](https://github.com/dexmate-ai/dexcontrol/releases),
+or clone the matching version of this repository:
+
+```bash
+git clone --branch v0.7.7-rc.2 https://github.com/dexmate-ai/dexcontrol.git
+cd dexcontrol
 ```
 
-To run the examples in this repo, you can try:
+This release candidate uses `0.7.7rc2` on PyPI and `0.7.7-rc.2` for Rust and
+the native SDK. Keep the repository, Python package, native SDK, and Rust
+dependency on the same release.
+Run the example commands from the repository root.
 
-```shell
-pip install dexcontrol[example]
+## Run examples
+
+After installing the package or native SDK below, use the same launcher for
+all three languages:
+
+```bash
+./run python read_joint_positions
+./run cpp read_joint_positions
+./run rust read_joint_positions
 ```
 
-## ⚠️ Version Compatibility
+The launcher uses your active Python environment or installed native SDK.
+C++ needs CMake and a C++ compiler; Rust needs Cargo and Rust. It checks only
+the selected language and prints installation commands for missing tools.
+Python 3.8 or newer is needed to run the launcher itself.
 
-**Important:** `dexcontrol >= 0.5.0` requires robot firmware `>= 0.5.0`. Older firmware will not work with this release — update the firmware first, or pin `dexcontrol` to `0.4.x` until you can upgrade.
+```bash
+./run --list
+./run cpp --list
+./run --release cpp read_joint_positions
+./run --build-only rust read_joint_positions
+./run --dry-run cpp read_joint_positions
+```
 
-If your firmware is outdated, please update it before installing the new version to ensure full compatibility. Please contact the Dexmate team if you do not know how to do it.
+`--release` builds optimized C++/Rust examples. `--build-only` compiles without
+running. `--dry-run` prints commands without building or running. Put launcher
+options before the example name; anything after it is passed to the example.
+The included `read_joint_positions` example always uses simulation.
 
-### Firmware Compatibility Matrix
+## Python
 
-`dexcontrol` and the robot firmware are released in lockstep on the minor version: a given `dexcontrol 0.X.y` is compatible with firmware `0.X.*`. You can check the firmware version on your robot by running `examples/troubleshooting/display_robot_info.py`.
+Requires Python 3.8 or newer. Wheels are available for Linux x86_64/ARM64 and
+macOS Intel/Apple Silicon. No C++ or Rust compiler is needed.
 
-| `dexcontrol` version | Compatible firmware version |
-| --- | --- |
-| `0.5.x` | `0.5.x` |
-| `0.4.x` | `0.4.x` |
-| `0.3.x` | `0.3.x` |
-| `0.2.x` | `0.2.x` |
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install dexcontrol==0.7.7rc2
+./run python read_joint_positions
+```
 
-If your firmware minor version does not match the `dexcontrol` version you intend to install, the client will print a version warning at startup and some features may not work correctly. Update the firmware first (see [vega-firmware](https://github.com/dexmate-ai/vega-firmware)) or pin `dexcontrol` to a version compatible with your current firmware.
+The example prints positions for the head, both arms, and torso:
 
-**📋 See [CHANGELOG.md](./CHANGELOG.md) for detailed release notes and version history.**
+```text
+head joint positions (rad): 0.0000, 0.0000, 0.0000
+left_arm joint positions (rad): 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000
+right_arm joint positions (rad): 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000, 0.0000
+torso joint positions (rad): 0.0000, 0.0000, 0.0000
+```
 
-## 📄 Licensing
+To read positions and move the simulated head, save this as `move_head.py`:
 
-This project is **dual-licensed**:
+```python
+from dexcontrol import Robot
 
-### 🔓 Open Source License
-This software is available under the **GNU Affero General Public License v3.0 (AGPL-3.0)**.
-See the [LICENSE](./LICENSE) file for details.
+with Robot(profile="vega_1", simulation=True) as robot:
+    head = robot.joints("head")
+    print("Before (rad):", head.get_joint_pos())
 
-### 💼 Commercial License
-For businesses that want to use this software in proprietary applications without the AGPL requirements, commercial licenses are available.
+    motion = head.move_to_joint_pos([0.1, 0.0, 0.0], wait=False)
+    motion.wait(timeout=10.0)
 
-**📧 Contact us for commercial licensing:** contact@dexmate.ai
+    print("After (rad):", head.get_joint_pos())
+```
 
-**Commercial licenses provide:**
-- ✅ Right to use in closed-source applications
-- ✅ No source code disclosure requirements
-- ✅ Priority support options
+Run it with `python move_head.py`. The `with` block closes the connection when
+it exits. Use `robot.joints("left_arm")`, `robot.joints("right_arm")`, or
+`robot.joints("torso")` to access another joint component.
 
+## Native SDK for C++ and Rust
 
-## 📚 Examples
+Download the matching archive and `SHA256SUMS` from
+[GitHub Releases](https://github.com/dexmate-ai/dexcontrol/releases).
+Choose the platform that matches your computer:
 
-Explore our comprehensive examples in the `examples/` directory:
+| Computer | Archive suffix |
+|---|---|
+| Linux x86_64 | `linux-x86_64` |
+| Linux ARM64 | `linux-aarch64` |
+| macOS Apple Silicon | `macos-arm64` |
+| macOS Intel | `macos-x86_64` |
 
-- 🎮 **Basic Control** - Simple movement and sensor reading
-- 🎯 **Advanced Control** - Complex manipulation tasks
-- 📺 **Teleoperation** - Remote control interfaces
-- 🔧 **Troubleshooting** - Diagnostic and maintenance tools
+For example, on Linux x86_64, place both downloads in the repository root:
 
----
+```bash
+sha256sum --ignore-missing -c SHA256SUMS
+python3 install_sdk.py dexcontrol-sdk-v0.7.7-rc.2-linux-x86_64.tar.gz "$HOME/.local/dexcontrol/0.7.7-rc.2"
+source "$HOME/.local/dexcontrol/0.7.7-rc.2/activate"
+```
 
-<div align="center">
-  <h3>🤝 Ready to build amazing robots?</h3>
-  <p>
-    <a href="mailto:contact@dexmate.ai">📧 Contact Us</a> •
-    <a href="./examples/">📚 View Examples</a> •
-  </p>
-</div>
+On macOS, use `shasum -a 256 <archive>` and compare the digest with the matching
+entry in `SHA256SUMS`, then run the installer with your archive's filename.
+
+Activate the SDK in each new terminal before building or running C++/Rust
+applications. Installation does not require administrator privileges. Use a new
+installation directory when installing another version.
+
+## C++
+
+Requires a C++17 compiler, CMake 3.16 or newer, and the activated native SDK.
+
+Build and run the joint-position example:
+
+```bash
+./run cpp read_joint_positions
+```
+
+It reads the same four components as the Python example and prints radians.
+
+For your own application, save this as `main.cpp`:
+
+```cpp
+#include <dexcontrol/dexcontrol.hpp>
+#include <iostream>
+#include <chrono>
+
+int main() {
+    try {
+        auto robot = dexcontrol::Robot::simulated("vega_1");
+        auto head = robot.joints("head");
+        auto motion = head.move_to_joint_pos(
+            {0.1, 0.0, 0.0}, dexcontrol::NoWait{});
+        motion.wait(dexcontrol::WaitFor{std::chrono::seconds(10)});
+
+        for (double position : head.get_joint_pos()) {
+            std::cout << position << ' ';
+        }
+        std::cout << "rad\n";
+        robot.close();
+    } catch (const std::exception& error) {
+        std::cerr << error.what() << '\n';
+        return 1;
+    }
+}
+```
+
+Create a `CMakeLists.txt` beside it:
+
+```cmake
+cmake_minimum_required(VERSION 3.16)
+project(my_robot LANGUAGES CXX)
+find_package(dexcontrol CONFIG REQUIRED)
+add_executable(my_robot main.cpp)
+target_compile_features(my_robot PRIVATE cxx_std_17)
+target_link_libraries(my_robot PRIVATE dexcontrol::dexcontrol)
+```
+
+From your application's directory:
+
+```bash
+cmake -S . -B build
+cmake --build build --parallel
+./build/my_robot
+```
+
+## Rust
+
+The single `dexcontrol` crate includes the Rust API and native-library bindings.
+It links to the separately installed native SDK.
+
+Requires Rust 1.90 or newer and the activated native SDK.
+
+Run the joint-position example from this repository:
+
+```bash
+./run rust read_joint_positions
+```
+
+For your own application:
+
+```bash
+cargo new my_robot
+cd my_robot
+cargo add dexcontrol@=0.7.7-rc.2
+```
+
+Replace `src/main.rs` with:
+
+```rust
+use dexcontrol::{MotionOptions, Robot};
+use std::time::Duration;
+
+fn main() -> dexcontrol::Result<()> {
+    let robot = Robot::simulated("vega_1")?;
+    let head = robot.joints("head")?;
+    let motion = head.move_to_joint_pos(
+        &[0.1, 0.0, 0.0], MotionOptions::default(),
+    )?;
+    motion.wait(Duration::from_secs(10))?;
+
+    println!("Head positions (rad): {:?}", head.get_joint_pos()?);
+    robot.close()
+}
+```
+
+Run it with `cargo run`.
+
+## Basic API
+
+| Task | Python | C++ | Rust |
+|---|---|---|---|
+| Select a joint component | `robot.joints("head")` | `robot.joints("head")` | `robot.joints("head")?` |
+| Read positions | `head.get_joint_pos()` | `head.get_joint_pos()` | `head.get_joint_pos()?` |
+| Resolve a named pose | `head.get_pose("home")` | `head.get_pose("home")` | `head.get_pose("home", false)?` |
+| Cancel a motion | `motion.cancel()` | `motion.cancel()` | `motion.cancel()?` |
+
+Pose names and available components depend on the robot model. Pose resolution
+applies the model's adjustments. To request stored joint values, use
+`passthrough=True` in Python, or `true` as the second `get_pose` argument in
+C++/Rust.
+
+Motion handles let you start a movement and wait for it later. The examples
+explicitly wait up to 10 seconds. Python and C++ report failures as exceptions;
+Rust returns `Result` values. Active E-stops block movement commands.
+
+Browse the API definitions for more options:
+
+- [Python types and methods](python/dexcontrol/_native.pyi)
+- [C++ API](include/dexcontrol/dexcontrol.hpp)
+- [Rust API](rust/dexcontrol/src/lib.rs)
+
+## Camera streams
+
+The standard packages support Zenoh camera image and depth streams. They do not
+include FFmpeg or WebRTC video decoding. A camera stream configured only for RTC
+reports that RTC support is not enabled; use a configured Zenoh topic stream.
+When both transports are configured for a stream, the SDK prefers the topic.
+Simulation does not verify that a real camera publisher offers that transport.
+
+## Connect to a robot
+
+Configure robot access on your computer and select the robot with
+`dextop robot use <robot-name>`. Use the model profile that matches your robot,
+such as `vega_1`, `vega_1p`, or `vega_1u`.
+
+Replace the simulated connection in the examples with:
+
+```python
+with Robot(profile="vega_1p") as robot:
+    print(robot.joints("head").get_joint_pos())
+```
+
+```cpp
+dexcontrol::ConnectOptions options;
+options.profile = "vega_1p";
+auto robot = dexcontrol::Robot::connect(options);
+```
+
+```rust
+let robot = Robot::connect(dexcontrol::ConnectOptions {
+    profile: Some("vega_1p"),
+    ..Default::default()
+})?;
+```
+
+Start with the joint-position example to check the connection. Movement commands
+on a real connection operate the physical robot.
+
+## License and support
+
+See [LICENSE](LICENSE) for licensing terms. For support and commercial licensing,
+contact [contact@dexmate.ai](mailto:contact@dexmate.ai).

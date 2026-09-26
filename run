@@ -1,0 +1,230 @@
+#!/usr/bin/env python3
+# Copyright (C) 2026 Dexmate Inc.
+#
+# This software is dual-licensed:
+#
+# 1. GNU Affero General Public License v3.0 (AGPL-3.0)
+#    See LICENSE-AGPL for details
+#
+# 2. Commercial License
+#    For commercial licensing terms, contact: contact@dexmate.ai
+"""Build and run public SDK examples with Python 3.8+ and its standard library."""
+import difflib
+from importlib import metadata
+import os
+from pathlib import Path
+import re
+import shlex
+import shutil
+import subprocess
+import sys
+
+ROOT = Path(__file__).resolve().parent
+LANGUAGES = {"cpp": "cpp", "c++": "cpp", "rust": "rust", "python": "python"}
+USAGE = """Usage: ./run [OPTIONS] LANGUAGE EXAMPLE [EXAMPLE_ARGUMENTS...]
+
+  ./run python read_joint_positions
+  ./run cpp read_joint_positions
+  ./run rust read_joint_positions
+  ./run --list                     List examples and languages
+  ./run cpp --list                 List C++ examples
+
+Options (before the example name):
+  --release     Build optimized C++/Rust examples (default: debug)
+  --build-only  Build C++/Rust examples without running them
+  --dry-run     Print commands without checking dependencies or running them
+  --help        Show this help
+
+Arguments after EXAMPLE are passed through unchanged. Examples retain their
+own defaults; read_joint_positions uses simulation in all three languages.
+Activate your Python environment for Python, or the native SDK for C++/Rust.
+"""
+
+
+class RunnerError(Exception):
+    pass
+
+
+def inventory(root):
+    entries = {}
+    for language, directory, extension in (
+        ("python", root / "examples/vega_1/python", ".py"),
+        ("cpp", root / "examples/vega_1/cpp", ".cpp"),
+        ("rust", root / "rust/dexcontrol/examples", ".rs"),
+    ):
+        for path in sorted(directory.glob("*" + extension)):
+            if not path.name.startswith("_"):
+                entries.setdefault(path.stem, {})[language] = path
+    return entries
+
+
+def parse(argv):
+    flags = set()
+    language = None
+    for index, word in enumerate(argv):
+        if word in ("--help", "-h"):
+            return None
+        if word in ("--list", "--release", "--build-only", "--dry-run"):
+            flags.add(word)
+        elif language is None and word in LANGUAGES:
+            language = LANGUAGES[word]
+        elif language and not word.startswith("-"):
+            if "--list" in flags:
+                raise RunnerError("--list does not take an example name.")
+            return language, word, flags, argv[index + 1:]
+        else:
+            raise RunnerError("Unknown argument: {}. Use ./run --help.".format(word))
+    if "--list" in flags:
+        return language, None, flags, []
+    if not argv:
+        return None
+    raise RunnerError("Choose a language and example. Use ./run --list.")
+
+
+def package_version(root):
+    manifest = (root / "rust/dexcontrol/Cargo.toml").read_text()
+    match = re.search(r'^version\s*=\s*"([^"]+)"', manifest, re.M)
+    if not match:
+        raise RunnerError("SDK package version is missing; download a complete SDK repository.")
+    return match.group(1)
+
+
+def command_exists(command):
+    if shutil.which(command):
+        return True
+    try:
+        words = shlex.split(command)
+    except ValueError:
+        return False
+    if not words or not shutil.which(words[0]):
+        return False
+    if Path(words[0]).name in {"ccache", "sccache", "distcc", "icecc"}:
+        return len(words) > 1 and bool(shutil.which(words[1]))
+    return True
+
+
+def check_tools(language, env):
+    missing = []
+    if language == "rust":
+        for executable in ("cargo", env.get("RUSTC", "rustc")):
+            if not command_exists(executable):
+                missing.append(executable)
+        hint = "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh\n  . \"$HOME/.cargo/env\""
+    else:
+        if not shutil.which("cmake"):
+            missing.append("cmake")
+        compiler = env.get("CXX")
+        if not env.get("CMAKE_TOOLCHAIN_FILE") and not (
+            command_exists(compiler) if compiler else any(shutil.which(c) for c in ("c++", "g++", "clang++"))
+        ):
+            missing.append(compiler or "C++ compiler")
+        generator = env.get("CMAKE_GENERATOR", "Unix Makefiles")
+        backend = "ninja" if "Ninja" in generator else "make" if generator == "Unix Makefiles" else None
+        if backend and not shutil.which(backend):
+            missing.append(backend)
+        if sys.platform == "darwin":
+            hint = "xcode-select --install\n  brew install cmake" + (" ninja" if backend == "ninja" else "")
+        elif shutil.which("dnf"):
+            hint = "sudo dnf install gcc-c++ cmake make" + (" ninja-build" if backend == "ninja" else "")
+        elif shutil.which("pacman"):
+            hint = "sudo pacman -S --needed base-devel cmake" + (" ninja" if backend == "ninja" else "")
+        else:
+            hint = "sudo apt-get update\n  sudo apt-get install build-essential cmake" + (" ninja-build" if backend == "ninja" else "")
+    if missing:
+        raise RunnerError("Missing {} tools: {}\nInstall with:\n  {}".format(language, ", ".join(missing), hint))
+
+
+def native_environment(root, env, version):
+    configured = env.get("DEXCONTROL_SDK_DIR")
+    sdk = Path(configured).expanduser().resolve() if configured else root
+    pc = sdk / "lib/pkgconfig/dexcontrol.pc"
+    if not pc.is_file():
+        raise RunnerError("Native SDK not found. Install the matching SDK, then run:\n"
+                          "  source /path/to/sdk/activate\nOr set DEXCONTROL_SDK_DIR to its installation directory.")
+    match = re.search(r"^Version:\s*(\S+)", pc.read_text(), re.M)
+    actual = match.group(1) if match else "unknown"
+    if actual != version:
+        raise RunnerError("Native SDK version {} does not match these examples ({}). Activate the matching SDK.".format(actual, version))
+    if not any((sdk / "lib" / name).is_file() for name in ("libdexcontrol_capi.so", "libdexcontrol_capi.dylib")):
+        raise RunnerError("Native SDK shared library is missing; reinstall the SDK.")
+    result = dict(env, DEXCONTROL_SDK_DIR=str(sdk))
+    for name, suffix in (("PATH", "bin"), ("CMAKE_PREFIX_PATH", ""), ("PKG_CONFIG_PATH", "lib/pkgconfig"),
+                         ("LD_LIBRARY_PATH", "lib"), ("DYLD_LIBRARY_PATH", "lib")):
+        result[name] = str(sdk / suffix) + (os.pathsep + env[name] if env.get(name) else "")
+    return result
+
+
+def commands(root, language, name, source, flags, arguments, env):
+    release = "--release" in flags
+    if language == "python":
+        return [[sys.executable, str(source), *arguments]]
+    if language == "rust":
+        return [["cargo", "build" if "--build-only" in flags else "run",
+                 "--manifest-path", str(root / "Cargo.toml"), "-p", "dexcontrol", "--example", name,
+                 *(["--release"] if release else []),
+                 *(["--", *arguments] if arguments else [])]]
+    profile = "Release" if release else "Debug"
+    build = root / "build" / ("cpp-" + profile.lower())
+    result = [["cmake", "-S", str(source.parent), "-B", str(build), "-DCMAKE_BUILD_TYPE=" + profile]]
+    if env.get("DEXCONTROL_SDK_DIR"):
+        result[0].append("-Ddexcontrol_DIR=" + str(Path(env["DEXCONTROL_SDK_DIR"]) / "lib/cmake/dexcontrol"))
+    result.append(["cmake", "--build", str(build), "--config", profile, "--target", name,
+                   "--parallel", str(min(4, os.cpu_count() or 1))])
+    if "--build-only" not in flags:
+        result.append([str(build / "bin" / name), *arguments])
+    return result
+
+
+def main(argv=None, root=ROOT):
+    parsed = parse(sys.argv[1:] if argv is None else argv)
+    if parsed is None:
+        print(USAGE)
+        return 0
+    language, name, flags, arguments = parsed
+    examples = inventory(root)
+    if name is None:
+        for example, languages in sorted(examples.items()):
+            if language is None or language in languages:
+                print("{}  ({})".format(example, ", ".join(sorted(languages))))
+        return 0
+    if language not in examples.get(name, {}):
+        available = [n for n, languages in examples.items() if language in languages]
+        matches = difflib.get_close_matches(name, available, n=1)
+        raise RunnerError("Unknown {} example: {}. {}Use ./run {} --list.".format(
+            language, name, "Did you mean {}? ".format(matches[0]) if matches else "", language))
+    if "--build-only" in flags and (language == "python" or arguments):
+        raise RunnerError("--build-only requires C++ or Rust and takes no example arguments.")
+    if language == "python" and "--release" in flags:
+        raise RunnerError("--release applies only to C++ and Rust.")
+    env = dict(os.environ)
+    if "--dry-run" not in flags:
+        version = package_version(root)
+        if language == "python":
+            expected = version.replace("-rc.", "rc")
+            try:
+                actual = metadata.version("dexcontrol")
+            except metadata.PackageNotFoundError:
+                actual = "not installed"
+            if actual != expected:
+                raise RunnerError("Python dexcontrol is {}; these examples require {}. Install with:\n  {} -m pip install dexcontrol=={}".format(
+                    actual, expected, shlex.quote(sys.executable), expected))
+        else:
+            check_tools(language, env)
+            env = native_environment(root, env, version)
+    for command in commands(root, language, name, examples[name][language], flags, arguments, env):
+        print("+ " + shlex.join(command), flush=True)
+        if "--dry-run" not in flags:
+            subprocess.run(command, cwd=root, env=env, check=True)
+    return 0
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main())
+    except (RunnerError, OSError) as error:
+        print("Error: {}".format(error), file=sys.stderr)
+        sys.exit(1)
+    except subprocess.CalledProcessError as error:
+        sys.exit(error.returncode if error.returncode >= 0 else 128 - error.returncode)
+    except KeyboardInterrupt:
+        sys.exit(130)

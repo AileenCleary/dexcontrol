@@ -1,0 +1,56 @@
+// Copyright (C) 2026 Dexmate Inc.
+//
+// This software is dual-licensed:
+//
+// 1. GNU Affero General Public License v3.0 (AGPL-3.0)
+//    See LICENSE-AGPL for details
+//
+// 2. Commercial License
+//    For commercial licensing terms, contact: contact@dexmate.ai
+
+// Generated public numeric C macros not emitted by bindgen.
+pub const DEX_ABI_VERSION: u32 = 5;
+pub const DEX_OK: i32 = 0;
+pub const DEX_INVALID_ARGUMENT: i32 = 1;
+pub const DEX_RUNTIME_ERROR: i32 = 2;
+pub const DEX_TIMEOUT: i32 = 3;
+pub const DEX_PANIC: i32 = 4;
+pub const DEX_STALE_STATE: i32 = 5;
+pub const DEX_STATE_UNAVAILABLE: i32 = 6;
+pub const DEX_SERVICE_REJECTED: i32 = 7;
+pub const DEX_ESTOP_ACTIVE: i32 = 8;
+pub const DEX_STOPPED: i32 = 9;
+pub const DEX_NO_WAIT: u32 = 0;
+pub const DEX_WAIT_UNTIL_COMPLETE: u32 = 1;
+pub const DEX_WAIT_WITH_TIMEOUT: u32 = 2;
+pub const DEX_MOTION_PENDING: u32 = 0;
+pub const DEX_MOTION_RUNNING: u32 = 1;
+pub const DEX_MOTION_SUCCEEDED: u32 = 2;
+pub const DEX_MOTION_CANCELLED: u32 = 3;
+pub const DEX_MOTION_FAILED: u32 = 4;
+pub const DEX_MOTION_SUPERSEDED: u32 = 5;
+pub const DEX_LIMIT_DISABLED: u64 = u64::MAX;
+pub const DEX_STATE_AGE_CONFIGURED: u64 = 0;
+pub const DEX_DEFAULT_MAX_STATE_AGE_MS: u64 = 500;
+pub const DEX_DEFAULT_WAIT_CEILING_MS: u64 = 300000;
+pub const DEX_JOINT_MODE_DISABLE: i32 = 1;
+pub const DEX_JOINT_MODE_ENABLE: i32 = 2;
+pub const DEX_JOINT_MODE_CALIBRATION: i32 = 3;
+pub const DEX_JOINT_MODE_POSITION: i32 = 4;
+pub const DEX_JOINT_MODE_VELOCITY: i32 = 5;
+pub const DEX_JOINT_MODE_TORQUE: i32 = 6;
+pub const DEX_JOINT_MODE_CURRENT: i32 = 7;
+pub const DEX_LIDAR_2D_RANGES: u32 = 0;
+pub const DEX_LIDAR_2D_ANGLES: u32 = 1;
+pub const DEX_LIDAR_2D_INTENSITIES: u32 = 0;
+pub const DEX_LIDAR_3D_X: u32 = 0;
+pub const DEX_LIDAR_3D_Y: u32 = 1;
+pub const DEX_LIDAR_3D_Z: u32 = 2;
+pub const DEX_LIDAR_3D_INTENSITY: u32 = 0;
+pub const DEX_LIDAR_3D_RING: u32 = 1;
+pub const DEX_LIDAR_3D_POINT_TIMESTAMPS: u32 = 2;
+pub const DEX_FRAME_RGB8: u32 = 0;
+pub const DEX_FRAME_BGR8: u32 = 1;
+pub const DEX_FRAME_GRAY8: u32 = 2;
+pub const DEX_FRAME_DEPTH32F: u32 = 3;
+pub const DEX_RATE_LIMITER_MAX_WINDOW: usize = 100000;
