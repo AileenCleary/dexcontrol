@@ -45,6 +45,26 @@ class RunnerError(Exception):
     pass
 
 
+def rust_binaries(manifest):
+    # The reviewed example manifest uses explicit [[bin]] entries. Reading these
+    # avoids treating shared Rust modules as runnable programs; Python 3.8 works.
+    binaries = {}
+    for block in manifest.read_text().split("[[bin]]")[1:]:
+        block = block.split("[", 1)[0]
+        name = re.search(r'^name\s*=\s*"([^"\n]+)"', block, re.M)
+        path = re.search(r'^path\s*=\s*"([^"\n]+)"', block, re.M)
+        if not name or not path:
+            raise RunnerError("Rust example manifest has an incomplete binary entry.")
+        relative = Path(path.group(1))
+        source = manifest.parent / relative
+        if relative.is_absolute() or ".." in relative.parts or not source.is_file() or source.suffix != ".rs":
+            raise RunnerError("Rust example manifest has an invalid source path.")
+        if source in binaries or name.group(1) in binaries.values():
+            raise RunnerError("Duplicate Rust binary entry.")
+        binaries[source] = name.group(1)
+    return binaries
+
+
 def inventory(root):
     entries = {}
     for language, directory, extension in (
@@ -52,9 +72,18 @@ def inventory(root):
         ("cpp", root / "examples/vega_1/cpp", ".cpp"),
         ("rust", root / "rust/dexcontrol/examples", ".rs"),
     ):
-        for path in sorted(directory.glob("*" + extension)):
-            if not path.name.startswith("_"):
+        for path in sorted(directory.rglob("*" + extension)):
+            excluded = {"build", "target", "__pycache__", ".venv"}
+            if not path.name.startswith("_") and not excluded.intersection(path.relative_to(directory).parts):
+                if language in entries.get(path.stem, {}):
+                    raise RunnerError("Duplicate {} example name: {}".format(language, path.stem))
                 entries.setdefault(path.stem, {})[language] = path
+    manifest = root / "examples/vega_1/rust/Cargo.toml"
+    if manifest.is_file():
+        for path in rust_binaries(manifest):
+            if "rust" in entries.get(path.stem, {}):
+                raise RunnerError("Duplicate rust example name: " + path.stem)
+            entries.setdefault(path.stem, {})["rust"] = path
     return entries
 
 
@@ -159,19 +188,27 @@ def commands(root, language, name, source, flags, arguments, env):
     if language == "python":
         return [[sys.executable, str(source), *arguments]]
     if language == "rust":
-        return [["cargo", "build" if "--build-only" in flags else "run",
-                 "--manifest-path", str(root / "Cargo.toml"), "-p", "dexcontrol", "--example", name,
+        manifest = root / "examples/vega_1/rust/Cargo.toml"
+        if manifest.is_file() and source in rust_binaries(manifest):
+            selection = ["--manifest-path", str(manifest), "--bin", rust_binaries(manifest)[source]]
+        else:
+            selection = ["--manifest-path", str(root / "Cargo.toml"), "-p", "dexcontrol", "--example", name]
+        return [["cargo", "build" if "--build-only" in flags else "run", *selection,
                  *(["--release"] if release else []),
                  *(["--", *arguments] if arguments else [])]]
     profile = "Release" if release else "Debug"
     build = root / "build" / ("cpp-" + profile.lower())
-    result = [["cmake", "-S", str(source.parent), "-B", str(build), "-DCMAKE_BUILD_TYPE=" + profile]]
+    suite = next((parent for parent in (source.parent, *source.parents)
+                  if parent.name == "cpp" and (parent / "CMakeLists.txt").is_file()), source.parent)
+    relative = source.relative_to(suite).with_suffix("")
+    target = relative.as_posix().replace("/", "_")
+    result = [["cmake", "-S", str(suite), "-B", str(build), "-DCMAKE_BUILD_TYPE=" + profile]]
     if env.get("DEXCONTROL_SDK_DIR"):
         result[0].append("-Ddexcontrol_DIR=" + str(Path(env["DEXCONTROL_SDK_DIR"]) / "lib/cmake/dexcontrol"))
-    result.append(["cmake", "--build", str(build), "--config", profile, "--target", name,
+    result.append(["cmake", "--build", str(build), "--config", profile, "--target", target,
                    "--parallel", str(min(4, os.cpu_count() or 1))])
     if "--build-only" not in flags:
-        result.append([str(build / "bin" / name), *arguments])
+        result.append([str(build / "bin" / relative), *arguments])
     return result
 
 

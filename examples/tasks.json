@@ -1,0 +1,1247 @@
+{
+  "tasks": [
+    {
+      "task": "advanced_examples/steer_chassis_sine",
+      "python": "vega_1/python/advanced_examples/steer_chassis_sine.py",
+      "cpp": "vega_1/cpp/advanced_examples/steer_chassis_sine.cpp",
+      "rust": "vega_1/rust/src/advanced_examples/steer_chassis_sine.rs",
+      "rust_bin": "advanced-steer-chassis-sine",
+      "simulation": true,
+      "cli_cpp": [
+        "amplitude",
+        "control-hz",
+        "duration",
+        "frequency",
+        "speed"
+      ],
+      "cli_rust": [
+        "amplitude",
+        "control-hz",
+        "duration",
+        "frequency",
+        "speed"
+      ],
+      "behavior": {
+        "summary": "Drive forward while sinusoidally changing both steering angles.",
+        "default": "For 6 s at 50 Hz, command both wheel speeds to 0.5 m/s and both steering angles to 0.6*sin(2*pi*0.5*t) rad. Request a stop on completion/cleanup. Requires a steer-drive base; it does not use generic chassis yaw velocity.",
+        "connection": "control",
+        "language_notes": {}
+      }
+    },
+    {
+      "task": "advanced_examples/configure_arm_pid",
+      "python": "vega_1/python/advanced_examples/configure_arm_pid.py",
+      "cpp": "vega_1/cpp/advanced_examples/configure_arm_pid.cpp",
+      "rust": "vega_1/rust/src/advanced_examples/configure_arm_pid.rs",
+      "rust_bin": "advanced-configure-arm-pid",
+      "simulation": true,
+      "cli_cpp": [
+        "p",
+        "side"
+      ],
+      "cli_rust": [
+        "p",
+        "side"
+      ],
+      "behavior": {
+        "summary": "Read or set arm PID multipliers.",
+        "default": "Require positional get or set. Address both arms by default; set sends seven multipliers, each defaulting to 1.0. Print service replies. PID writes can take about 40 s; the SDK waits up to 45 s for a reply. A timeout does not cancel a server-side write.",
+        "connection": "control",
+        "language_notes": {}
+      }
+    },
+    {
+      "task": "advanced_examples/configure_ee_baud_rate",
+      "python": "vega_1/python/advanced_examples/configure_ee_baud_rate.py",
+      "cpp": "vega_1/cpp/advanced_examples/configure_ee_baud_rate.cpp",
+      "rust": "vega_1/rust/src/advanced_examples/configure_ee_baud_rate.rs",
+      "rust_bin": "advanced-configure-ee-baud-rate",
+      "simulation": true,
+      "cli_cpp": [
+        "baud-rate",
+        "side"
+      ],
+      "cli_rust": [
+        "baud-rate",
+        "side"
+      ],
+      "behavior": {
+        "summary": "Read or set end-effector RS485 baud rates.",
+        "default": "Require positional get or set. Address both arm end-effector interfaces by default; set uses 115200 baud unless overridden. Print service replies.",
+        "connection": "control",
+        "language_notes": {}
+      }
+    },
+    {
+      "task": "advanced_examples/configure_arm_ft_sensor",
+      "python": "vega_1/python/advanced_examples/configure_arm_ft_sensor.py",
+      "cpp": "vega_1/cpp/advanced_examples/configure_arm_ft_sensor.cpp",
+      "rust": "vega_1/rust/src/advanced_examples/configure_arm_ft_sensor.rs",
+      "rust_bin": "advanced-configure-arm-ft-sensor",
+      "simulation": true,
+      "cli_cpp": [
+        "side"
+      ],
+      "cli_rust": [
+        "side"
+      ],
+      "behavior": {
+        "summary": "Read, enable, or disable arm force-torque sensor modes.",
+        "default": "Require positional get, enable, or disable. Address both arms by default and print service replies; this does not zero the force sensors.",
+        "connection": "control",
+        "language_notes": {}
+      }
+    },
+    {
+      "task": "advanced_examples/send_end_effector_bytes",
+      "python": "vega_1/python/advanced_examples/send_end_effector_bytes.py",
+      "cpp": "vega_1/cpp/advanced_examples/send_end_effector_bytes.cpp",
+      "rust": "vega_1/rust/src/advanced_examples/send_end_effector_bytes.rs",
+      "rust_bin": "advanced-send-end-effector-bytes",
+      "simulation": true,
+      "cli_cpp": [
+        "message-hex",
+        "side",
+        "timeout"
+      ],
+      "cli_rust": [
+        "message-hex",
+        "side",
+        "timeout"
+      ],
+      "behavior": {
+        "summary": "Send raw bytes to end effectors and poll for replies.",
+        "default": "By default, send hex 09 10 03 E8 00 03 06 01 00 00 00 00 00 72 E1 to both configured arm pass-through interfaces and poll for up to 1 s each. The attached device determines what these bytes do; this is not a generic motion command.",
+        "connection": "control",
+        "language_notes": {}
+      }
+    },
+    {
+      "task": "advanced_examples/manage_arm_brakes",
+      "python": "vega_1/python/advanced_examples/manage_arm_brakes.py",
+      "cpp": "vega_1/cpp/advanced_examples/manage_arm_brakes.cpp",
+      "rust": "vega_1/rust/src/advanced_examples/manage_arm_brakes.rs",
+      "rust_bin": "advanced-manage-arm-brakes",
+      "simulation": true,
+      "cli_cpp": [
+        "all",
+        "joint",
+        "side",
+        "yes"
+      ],
+      "cli_rust": [
+        "all",
+        "joint",
+        "side",
+        "yes"
+      ],
+      "behavior": {
+        "summary": "Read, release, or engage arm brakes.",
+        "default": "Require positional status, release, or engage. status and engage address both arms and all their joints unless --side or --joint narrow them. release has no defaults: it requires --side left, right, or both, and either --joint INDEX (repeatable) or --all. Before releasing, warn that the arm must be physically supported, because a released joint can drop under gravity, and require typing yes; --yes skips the prompt and simulated runs do not prompt. This operates the brake service, not the motor-mode service.",
+        "connection": "control",
+        "language_notes": {}
+      }
+    },
+    {
+      "task": "advanced_examples/monitor_joint_currents",
+      "python": "vega_1/python/advanced_examples/monitor_joint_currents.py",
+      "cpp": "vega_1/cpp/advanced_examples/monitor_joint_currents.cpp",
+      "rust": "vega_1/rust/src/advanced_examples/monitor_joint_currents.rs",
+      "rust_bin": "advanced-monitor-joint-currents",
+      "simulation": true,
+      "cli_cpp": [
+        "component",
+        "period",
+        "samples"
+      ],
+      "cli_rust": [
+        "component",
+        "period",
+        "samples"
+      ],
+      "behavior": {
+        "summary": "Monitor joint currents for components that report per-joint current.",
+        "default": "Probe all components by default, skip unsupported current readings, then poll continuously at 0.02 s intervals until Ctrl-C; --samples N stops after N polls. Fail if none report current; --component limits the selection.",
+        "connection": "control",
+        "language_notes": {
+          "python": "Starts/connects a Rerun viewer by default; --no-display prints instead. Missing rerun-sdk falls back to printing.",
+          "cpp": "Prints numeric summaries/frame metadata; does not open a viewer.",
+          "rust": "Prints numeric summaries/frame metadata; does not open a viewer."
+        }
+      }
+    },
+    {
+      "task": "advanced_examples/estop_robot",
+      "python": "vega_1/python/advanced_examples/estop_robot.py",
+      "cpp": "vega_1/cpp/advanced_examples/estop_robot.cpp",
+      "rust": "vega_1/rust/src/advanced_examples/estop_robot.rs",
+      "rust_bin": "advanced-estop-robot",
+      "simulation": true,
+      "cli_cpp": [],
+      "cli_rust": [],
+      "behavior": {
+        "summary": "Read, activate, or deactivate the software E-stop.",
+        "default": "Default positional action is status. activate requests software E-stop; deactivate clears it. Print the resulting observed status.",
+        "connection": "control",
+        "language_notes": {}
+      }
+    },
+    {
+      "task": "advanced_examples/pose_both_arms",
+      "python": "vega_1/python/advanced_examples/pose_both_arms.py",
+      "cpp": "vega_1/cpp/advanced_examples/pose_both_arms.cpp",
+      "rust": "vega_1/rust/src/advanced_examples/pose_both_arms.rs",
+      "rust_bin": "advanced-pose-both-arms",
+      "simulation": true,
+      "cli_cpp": [
+        "passthrough",
+        "pose",
+        "timeout",
+        "velocity-scale"
+      ],
+      "cli_rust": [
+        "passthrough",
+        "pose",
+        "timeout",
+        "velocity-scale"
+      ],
+      "behavior": {
+        "summary": "Move both arms to a named pose using independent tracked motions.",
+        "default": "Default to folded at velocity scale 0.5. Resolve each pose using its model-declared frame: folded poses are joint-relative; orientation reference poses use torso pitch. --passthrough uses raw stored values. Start both targets through best-effort fan-out, wait up to 10 s, and require aggregate success. No synchronized start or collision checking is provided.",
+        "connection": "control",
+        "language_notes": {}
+      }
+    },
+    {
+      "task": "advanced_examples/fold_or_unfold_robot",
+      "python": "vega_1/python/advanced_examples/fold_or_unfold_robot.py",
+      "cpp": "vega_1/cpp/advanced_examples/fold_or_unfold_robot.cpp",
+      "rust": "vega_1/rust/src/advanced_examples/fold_or_unfold_robot.rs",
+      "rust_bin": "advanced-fold-or-unfold-robot",
+      "simulation": true,
+      "cli_cpp": [
+        "timeout",
+        "tolerance",
+        "unfold"
+      ],
+      "cli_rust": [
+        "timeout",
+        "tolerance",
+        "unfold"
+      ],
+      "behavior": {
+        "summary": "Fold or unfold the robot in ordered, verified stages.",
+        "default": "Default: close available hands, move both arms to folded, then torso to folded and head to tucked. With --unfold: move torso to crouch45_high, then resolve/move head home, then resolve/move arms to L_shape. Skip absent components; check motion success and measured positions within 0.1 rad before advancing. No collision checking is provided.",
+        "connection": "control",
+        "language_notes": {
+          "python": "Wait 1 s after closing each available hand before the arm stage.",
+          "cpp": "Wait 1 s after closing each available hand before the arm stage.",
+          "rust": "Publish hand-close setpoints without a fixed settling delay before the arm stage."
+        }
+      }
+    },
+    {
+      "task": "advanced_examples/pose_arms_sequentially",
+      "python": "vega_1/python/advanced_examples/pose_arms_sequentially.py",
+      "cpp": "vega_1/cpp/advanced_examples/pose_arms_sequentially.cpp",
+      "rust": "vega_1/rust/src/advanced_examples/pose_arms_sequentially.rs",
+      "rust_bin": "advanced-pose-arms-sequentially",
+      "simulation": true,
+      "cli_cpp": [
+        "pose",
+        "side",
+        "timeout",
+        "velocity-scale"
+      ],
+      "cli_rust": [
+        "pose",
+        "side",
+        "timeout",
+        "velocity-scale"
+      ],
+      "behavior": {
+        "summary": "Move arms sequentially to a named pose without collision checking.",
+        "default": "Move the left arm and then the right arm to L_shape at velocity scale 0.5, waiting up to 10 s each. --side can select one arm. Resolve model-declared pose frames, including torso compensation for L_shape. No homing or collision planning is performed.",
+        "connection": "control",
+        "language_notes": {}
+      }
+    },
+    {
+      "task": "advanced_examples/keyboard_jog_joint",
+      "python": "vega_1/python/advanced_examples/keyboard_jog_joint.py",
+      "cpp": "vega_1/cpp/advanced_examples/keyboard_jog_joint.cpp",
+      "rust": "vega_1/rust/src/advanced_examples/keyboard_jog_joint.rs",
+      "rust_bin": "advanced-keyboard-jog-joint",
+      "simulation": true,
+      "cli_cpp": [
+        "component",
+        "control-hz",
+        "duration",
+        "joint",
+        "speed"
+      ],
+      "cli_rust": [
+        "component",
+        "joint",
+        "step"
+      ],
+      "behavior": {
+        "summary": "Jog a selected joint using keyboard commands.",
+        "default": "Default component is left_arm and selected joint is 0. w/s move in opposite directions, digits select a joint, and q exits. Interaction and command increments differ by language; see the language notes.",
+        "connection": "control",
+        "language_notes": {
+          "python": "Raw-terminal hold/repeat w/s input at 100 Hz and 0.2 rad/s. A tap moves the joint by up to 0.05 rad; a hold keeps moving and stops within 0.05 rad of the release. Runs until q/Ctrl-C; no duration option.",
+          "cpp": "Same hold/repeat and tap behaviour, with an optional duration limit; raw-terminal input on Linux.",
+          "rust": "Line input: press Enter after each command. Each w/s applies a 0.02 rad direct step by default; EOF or q exits. Does not implement key-hold velocity control."
+        }
+      }
+    },
+    {
+      "task": "advanced_examples/move_to_pose/pose_arm",
+      "python": "vega_1/python/advanced_examples/move_to_pose/pose_arm.py",
+      "cpp": "vega_1/cpp/advanced_examples/move_to_pose/pose_arm.cpp",
+      "rust": "vega_1/rust/src/advanced_examples/move_to_pose/pose_arm.rs",
+      "rust_bin": "advanced-pose-arm",
+      "simulation": true,
+      "cli_cpp": [
+        "passthrough",
+        "pose",
+        "side",
+        "timeout"
+      ],
+      "cli_rust": [
+        "passthrough",
+        "pose",
+        "side",
+        "timeout"
+      ],
+      "behavior": {
+        "summary": "Move one arm to a named pose using its model-declared reference frame.",
+        "default": "Move the right arm to L_shape with model-defined torso-pitch compensation; wait up to 10 s. folded and folded_closed_hand stay joint-relative and receive no compensation. zero stores seven zeros relative to an upright torso and compensates only torso tilt from upright; --passthrough returns literal zeros. --passthrough uses raw stored values while retaining target validation. No collision checking is performed.",
+        "connection": "control",
+        "language_notes": {}
+      }
+    },
+    {
+      "task": "advanced_examples/move_to_pose/pose_head",
+      "python": "vega_1/python/advanced_examples/move_to_pose/pose_head.py",
+      "cpp": "vega_1/cpp/advanced_examples/move_to_pose/pose_head.cpp",
+      "rust": "vega_1/rust/src/advanced_examples/move_to_pose/pose_head.rs",
+      "rust_bin": "advanced-pose-head",
+      "simulation": true,
+      "cli_cpp": [
+        "passthrough",
+        "pose",
+        "timeout"
+      ],
+      "cli_rust": [
+        "passthrough",
+        "pose",
+        "timeout"
+      ],
+      "behavior": {
+        "summary": "Move the head to a named pose using its model-declared reference frame.",
+        "default": "Move to home using model-defined torso-pitch compensation; tucked stays joint-relative. --passthrough uses raw stored values. Wait up to 10 s. No collision checking is performed.",
+        "connection": "control",
+        "language_notes": {}
+      }
+    },
+    {
+      "task": "advanced_examples/move_to_pose/pose_torso",
+      "python": "vega_1/python/advanced_examples/move_to_pose/pose_torso.py",
+      "cpp": "vega_1/cpp/advanced_examples/move_to_pose/pose_torso.cpp",
+      "rust": "vega_1/rust/src/advanced_examples/move_to_pose/pose_torso.rs",
+      "rust_bin": "advanced-pose-torso",
+      "simulation": true,
+      "cli_cpp": [
+        "pose",
+        "timeout"
+      ],
+      "cli_rust": [
+        "pose",
+        "timeout"
+      ],
+      "behavior": {
+        "summary": "Move the torso to a named joint pose.",
+        "default": "Move to home and wait up to 10 s for tracked completion. No collision checking or automatic return is performed.",
+        "connection": "control",
+        "language_notes": {}
+      }
+    },
+    {
+      "task": "advanced_examples/reboot_control_board",
+      "python": "vega_1/python/advanced_examples/reboot_control_board.py",
+      "cpp": "vega_1/cpp/advanced_examples/reboot_control_board.cpp",
+      "rust": "vega_1/rust/src/advanced_examples/reboot_control_board.rs",
+      "rust_bin": "advanced-reboot-control-board",
+      "simulation": true,
+      "cli_cpp": [
+        "yes"
+      ],
+      "cli_rust": [
+        "yes"
+      ],
+      "behavior": {
+        "summary": "Request a reboot of one robot control board.",
+        "default": "Require positional arm, torso, or chassis. The arm board controls both arms. A rebooting board stops controlling its joints, so ask for confirmation first and require typing yes; --yes skips the prompt and simulated runs do not prompt. Send the request and exit; do not wait for the board to come back online.",
+        "connection": "control",
+        "language_notes": {}
+      }
+    },
+    {
+      "task": "advanced_examples/replay_trajectory",
+      "python": "vega_1/python/advanced_examples/replay_trajectory.py",
+      "cpp": "vega_1/cpp/advanced_examples/replay_trajectory.cpp",
+      "rust": "vega_1/rust/src/advanced_examples/replay_trajectory.rs",
+      "rust_bin": "advanced-replay-trajectory",
+      "simulation": true,
+      "cli_cpp": [
+        "control-hz",
+        "max-goal-diff",
+        "smooth",
+        "speed-factor",
+        "vel-smooth",
+        "velocity-compensation",
+        "visualize"
+      ],
+      "cli_rust": [
+        "control-hz",
+        "max-goal-diff",
+        "no-confirm",
+        "timeout"
+      ],
+      "behavior": {
+        "summary": "Prepare robot joint positions and replay a recorded trajectory.",
+        "default": "Require a trajectory file and confirmation before motion. Move to preparation/start targets, then stream recorded joint positions with the configured tracking-error guard. Preparation motions and processing options differ by language; see the language notes.",
+        "connection": "control",
+        "language_notes": {
+          "python": "CSV input (the format all three languages share; NPZ recordings are still accepted). Prompt, optionally smooth/resample/plot, then prompt before folding both arms, sending head home, crouching torso to crouch20_medium, re-resolving head home for the new torso posture, and closing hands. Press Enter before moving to the recorded first row and streaming. Defaults: 0.1 s position smoothing, speed factor 1, no velocity feed-forward; rate from file or 500 Hz. Checks every sample against the robot model's joint limits before moving and reports violations per joint; --clamp-to-model-limits clips them instead of refusing the file.",
+          "cpp": "CSV input. Performs the same extra folding/head/torso/hand preparation as Python. Supports smoothing, resampling and velocity feed-forward; --visualize prints a summary instead of a plot. Prompts before preparation and playback.",
+          "rust": "CSV input. Confirm unless --no-confirm (simulation bypasses the prompt); move directly to the recorded first row, then stream. Does not fold/crouch/close hands or smooth/resample/add velocity feed-forward. Rate from file or 500 Hz."
+        }
+      }
+    },
+    {
+      "task": "basic_examples/control/close_hand",
+      "python": "vega_1/python/basic_examples/control/close_hand.py",
+      "cpp": "vega_1/cpp/basic_examples/control/close_hand.cpp",
+      "rust": "vega_1/rust/src/basic_examples/control/close_hand.rs",
+      "rust_bin": "control-close-hand",
+      "simulation": true,
+      "cli_cpp": [
+        "grasp-torque",
+        "side",
+        "wait-time"
+      ],
+      "cli_rust": [
+        "grasp-torque",
+        "side",
+        "wait-time"
+      ],
+      "behavior": {
+        "summary": "Close one hand using its model-defined pose.",
+        "default": "Command the right hand closed and wait 2 s. Optional --grasp-torque changes the grip setting for a gripper; omitted values use model defaults. The delay is not a convergence check.",
+        "connection": "control",
+        "language_notes": {}
+      }
+    },
+    {
+      "task": "basic_examples/control/set_head_motor_mode",
+      "python": "vega_1/python/basic_examples/control/set_head_motor_mode.py",
+      "cpp": "vega_1/cpp/basic_examples/control/set_head_motor_mode.cpp",
+      "rust": "vega_1/rust/src/basic_examples/control/set_head_motor_mode.rs",
+      "rust_bin": "control-set-head-motor-mode",
+      "simulation": true,
+      "cli_cpp": [],
+      "cli_rust": [],
+      "behavior": {
+        "summary": "Enable or disable head motors.",
+        "default": "The optional positional mode is enable or disable; without it, send disable. Print the firmware reply; no head target is commanded.",
+        "connection": "control",
+        "language_notes": {}
+      }
+    },
+    {
+      "task": "basic_examples/control/cycle_arm",
+      "python": "vega_1/python/basic_examples/control/cycle_arm.py",
+      "cpp": "vega_1/cpp/basic_examples/control/cycle_arm.cpp",
+      "rust": "vega_1/rust/src/basic_examples/control/cycle_arm.rs",
+      "rust_bin": "control-cycle-arm",
+      "simulation": true,
+      "cli_cpp": [
+        "delta",
+        "joint",
+        "relative",
+        "side",
+        "timeout",
+        "velocity-scale"
+      ],
+      "cli_rust": [
+        "delta",
+        "joint",
+        "relative",
+        "side",
+        "timeout",
+        "velocity-scale"
+      ],
+      "behavior": {
+        "summary": "Move one arm joint by an offset, then return to its starting position.",
+        "default": "Save the right arm positions, move joint 0 by +0.2 rad, then return to the saved absolute start after outward success. By default compute an absolute outward target; --relative resolves the offset from fresh feedback. Both motions use velocity scale 0.2 and a 10 s wait deadline.",
+        "connection": "control",
+        "language_notes": {}
+      }
+    },
+    {
+      "task": "basic_examples/control/exercise_chassis",
+      "python": "vega_1/python/basic_examples/control/exercise_chassis.py",
+      "cpp": "vega_1/cpp/basic_examples/control/exercise_chassis.cpp",
+      "rust": "vega_1/rust/src/basic_examples/control/exercise_chassis.rs",
+      "rust_bin": "control-exercise-chassis",
+      "simulation": true,
+      "cli_cpp": [
+        "control-hz",
+        "duration",
+        "speed"
+      ],
+      "cli_rust": [
+        "control-hz",
+        "duration",
+        "speed"
+      ],
+      "behavior": {
+        "summary": "Drive the chassis in six directions, requesting a stop between them.",
+        "default": "Command forward, backward, left, right, counter-clockwise, then clockwise for 3 s each, streaming commands at 50 Hz by default (--control-hz). Linear speed is 0.1 m/s and turn speed is 0.1 rad/s. Request stops between directions and on cleanup; requires a base capable of strafing.",
+        "connection": "control",
+        "language_notes": {}
+      }
+    },
+    {
+      "task": "basic_examples/control/cycle_hand",
+      "python": "vega_1/python/basic_examples/control/cycle_hand.py",
+      "cpp": "vega_1/cpp/basic_examples/control/cycle_hand.cpp",
+      "rust": "vega_1/rust/src/basic_examples/control/cycle_hand.rs",
+      "rust_bin": "control-cycle-hand",
+      "simulation": true,
+      "cli_cpp": [
+        "side",
+        "wait-time"
+      ],
+      "cli_rust": [
+        "side",
+        "wait-time"
+      ],
+      "behavior": {
+        "summary": "Close one hand, then reopen it.",
+        "default": "Command the right hand to its model-defined closed pose, wait 2 s, command its open pose, then wait 2 s. These delays are not tracked-motion completion checks.",
+        "connection": "control",
+        "language_notes": {}
+      }
+    },
+    {
+      "task": "basic_examples/control/sweep_head_joints",
+      "python": "vega_1/python/basic_examples/control/sweep_head_joints.py",
+      "cpp": "vega_1/cpp/basic_examples/control/sweep_head_joints.cpp",
+      "rust": "vega_1/rust/src/basic_examples/control/sweep_head_joints.rs",
+      "rust_bin": "control-sweep-head-joints",
+      "simulation": true,
+      "cli_cpp": [
+        "delta",
+        "timeout"
+      ],
+      "cli_rust": [
+        "delta",
+        "timeout"
+      ],
+      "behavior": {
+        "summary": "Sweep head joints through positive, negative, and zero targets.",
+        "default": "First command head joint 0 to -pi/6 rad with other joints zero. Then command each joint to +0.5, -0.5, and zero radians, with all other target joints zero. Finish at all zeros; wait up to 10 s per motion.",
+        "connection": "control",
+        "language_notes": {
+          "python": "The sequence assumes exactly three head joints.",
+          "cpp": "The sequence assumes exactly three head joints.",
+          "rust": "The sequence uses the model joint count."
+        }
+      }
+    },
+    {
+      "task": "basic_examples/control/cycle_torso",
+      "python": "vega_1/python/basic_examples/control/cycle_torso.py",
+      "cpp": "vega_1/cpp/basic_examples/control/cycle_torso.cpp",
+      "rust": "vega_1/rust/src/basic_examples/control/cycle_torso.rs",
+      "rust_bin": "control-cycle-torso",
+      "simulation": true,
+      "cli_cpp": [
+        "delta",
+        "joint",
+        "relative",
+        "timeout"
+      ],
+      "cli_rust": [
+        "delta",
+        "joint",
+        "relative",
+        "timeout"
+      ],
+      "behavior": {
+        "summary": "Move the torso to an offset joint target, then return to its starting position.",
+        "default": "Read the torso positions and move joint 0 by +0.1 rad with a planned tracked motion. By default compute an absolute target from the stored start; --relative lets the API resolve the offset against fresh feedback. Always return to the stored absolute start after outward success. Each motion wait has a 10 s deadline.",
+        "connection": "control",
+        "language_notes": {}
+      }
+    },
+    {
+      "task": "basic_examples/control/open_hand",
+      "python": "vega_1/python/basic_examples/control/open_hand.py",
+      "cpp": "vega_1/cpp/basic_examples/control/open_hand.cpp",
+      "rust": "vega_1/rust/src/basic_examples/control/open_hand.rs",
+      "rust_bin": "control-open-hand",
+      "simulation": true,
+      "cli_cpp": [
+        "grasp-torque",
+        "side",
+        "wait-time"
+      ],
+      "cli_rust": [
+        "grasp-torque",
+        "side",
+        "wait-time"
+      ],
+      "behavior": {
+        "summary": "Open one hand using its model-defined pose.",
+        "default": "Command the right hand open and wait 2 s. Optional --grasp-torque changes the grip setting for a gripper; omitted values use model defaults. The delay is not a convergence check.",
+        "connection": "control",
+        "language_notes": {}
+      }
+    },
+    {
+      "task": "basic_examples/sensors/read_2d_lidar_scan",
+      "python": "vega_1/python/basic_examples/sensors/read_2d_lidar_scan.py",
+      "cpp": "vega_1/cpp/basic_examples/sensors/read_2d_lidar_scan.cpp",
+      "rust": "vega_1/rust/src/basic_examples/sensors/read_2d_lidar_scan.rs",
+      "rust_bin": "sensor-read-2d-lidar-scan",
+      "simulation": true,
+      "cli_cpp": [
+        "sensor"
+      ],
+      "cli_rust": [
+        "sensor"
+      ],
+      "behavior": {
+        "summary": "Read and display one 2D LiDAR scan.",
+        "default": "Enable lidar_2d_front, wait up to 10 s for activity, and read one cached scan. Python can visualize XY points; native examples print range statistics. No scan file is saved.",
+        "connection": "control",
+        "language_notes": {
+          "python": "Starts/connects a Rerun viewer by default; --no-display prints instead. Missing rerun-sdk falls back to printing.",
+          "cpp": "Prints numeric summaries/frame metadata; does not open a viewer.",
+          "rust": "Prints numeric summaries/frame metadata; does not open a viewer."
+        }
+      }
+    },
+    {
+      "task": "basic_examples/sensors/monitor_3d_lidar_points",
+      "python": "vega_1/python/basic_examples/sensors/monitor_3d_lidar_points.py",
+      "cpp": "vega_1/cpp/basic_examples/sensors/monitor_3d_lidar_points.cpp",
+      "rust": "vega_1/rust/src/basic_examples/sensors/monitor_3d_lidar_points.rs",
+      "rust_bin": "sensor-monitor-3d-lidar-points",
+      "simulation": true,
+      "cli_cpp": [
+        "period",
+        "position",
+        "samples"
+      ],
+      "cli_rust": [
+        "period",
+        "position",
+        "samples"
+      ],
+      "behavior": {
+        "summary": "Monitor point clouds from one 3D LiDAR.",
+        "default": "Enable the front 3D LiDAR, wait up to 10 s for activity, and poll 100 times at 0.1 s intervals. --position back selects the rear LiDAR; no cloud file is saved.",
+        "connection": "control",
+        "language_notes": {
+          "python": "Starts/connects a Rerun viewer by default; --no-display prints instead. Missing rerun-sdk falls back to printing.",
+          "cpp": "Prints numeric summaries/frame metadata; does not open a viewer.",
+          "rust": "Prints numeric summaries/frame metadata; does not open a viewer."
+        }
+      }
+    },
+    {
+      "task": "basic_examples/sensors/monitor_lidar_imu",
+      "python": "vega_1/python/basic_examples/sensors/monitor_lidar_imu.py",
+      "cpp": "vega_1/cpp/basic_examples/sensors/monitor_lidar_imu.cpp",
+      "rust": "vega_1/rust/src/basic_examples/sensors/monitor_lidar_imu.rs",
+      "rust_bin": "sensor-monitor-lidar-imu",
+      "simulation": true,
+      "cli_cpp": [
+        "period",
+        "samples",
+        "sensor"
+      ],
+      "cli_rust": [
+        "period",
+        "samples",
+        "sensor"
+      ],
+      "behavior": {
+        "summary": "Monitor the IMU associated with a 3D LiDAR.",
+        "default": "Enable lidar_3d_front_imu, wait up to 10 s for activity, and print 100 observations at 0.05 s intervals. --sensor selects another declared IMU.",
+        "connection": "control",
+        "language_notes": {}
+      }
+    },
+    {
+      "task": "basic_examples/sensors/read_arm_buttons",
+      "python": "vega_1/python/basic_examples/sensors/read_arm_buttons.py",
+      "cpp": "vega_1/cpp/basic_examples/sensors/read_arm_buttons.cpp",
+      "rust": "vega_1/rust/src/basic_examples/sensors/read_arm_buttons.rs",
+      "rust_bin": "sensor-read-arm-buttons",
+      "simulation": true,
+      "cli_cpp": [
+        "period",
+        "samples",
+        "side"
+      ],
+      "cli_rust": [
+        "period",
+        "samples",
+        "side"
+      ],
+      "behavior": {
+        "summary": "Read and print arm wrist-button states.",
+        "default": "Read one right-arm button observation by default. --samples and --period repeat the reads; the default repeat interval is 0.1 s.",
+        "connection": "control",
+        "language_notes": {}
+      }
+    },
+    {
+      "task": "basic_examples/sensors/read_battery_status",
+      "python": "vega_1/python/basic_examples/sensors/read_battery_status.py",
+      "cpp": "vega_1/cpp/basic_examples/sensors/read_battery_status.cpp",
+      "rust": "vega_1/rust/src/basic_examples/sensors/read_battery_status.rs",
+      "rust_bin": "sensor-read-battery-status",
+      "simulation": true,
+      "cli_cpp": [
+        "period",
+        "samples"
+      ],
+      "cli_rust": [
+        "period",
+        "samples"
+      ],
+      "behavior": {
+        "summary": "Read and print battery status.",
+        "default": "Wait up to 5 s for battery activity and print one observation by default, including charge, voltage, current and temperature. Optional repeated reads use a 0.5 s interval.",
+        "connection": "control",
+        "language_notes": {}
+      }
+    },
+    {
+      "task": "basic_examples/sensors/monitor_chassis_cameras",
+      "python": "vega_1/python/basic_examples/sensors/monitor_chassis_cameras.py",
+      "cpp": "vega_1/cpp/basic_examples/sensors/monitor_chassis_cameras.cpp",
+      "rust": "vega_1/rust/src/basic_examples/sensors/monitor_chassis_cameras.rs",
+      "rust_bin": "sensor-monitor-chassis-cameras",
+      "simulation": true,
+      "cli_cpp": [
+        "camera",
+        "period",
+        "samples",
+        "stream"
+      ],
+      "cli_rust": [
+        "camera",
+        "period",
+        "samples",
+        "stream"
+      ],
+      "behavior": {
+        "summary": "Monitor frames from configured chassis cameras.",
+        "default": "Select base_*_camera sensors from the selected configuration unless --camera is supplied. Subscribe to all advertised streams unless --stream selects a subset; poll 200 times at 30 Hz, then unsubscribe. No image files are saved.",
+        "connection": "control",
+        "language_notes": {
+          "python": "Starts/connects a Rerun viewer by default; --no-display prints instead. Missing rerun-sdk falls back to printing.",
+          "cpp": "Prints numeric summaries/frame metadata; does not open a viewer.",
+          "rust": "Prints numeric summaries/frame metadata; does not open a viewer."
+        }
+      }
+    },
+    {
+      "task": "basic_examples/sensors/read_arm_force_torque",
+      "python": "vega_1/python/basic_examples/sensors/read_arm_force_torque.py",
+      "cpp": "vega_1/cpp/basic_examples/sensors/read_arm_force_torque.cpp",
+      "rust": "vega_1/rust/src/basic_examples/sensors/read_arm_force_torque.rs",
+      "rust_bin": "sensor-read-arm-force-torque",
+      "simulation": true,
+      "cli_cpp": [
+        "period",
+        "samples",
+        "side"
+      ],
+      "cli_rust": [
+        "period",
+        "samples",
+        "side"
+      ],
+      "behavior": {
+        "summary": "Read and print one arm force-torque observation.",
+        "default": "Wait up to 5 s for the right-arm wrench stream and print one observation by default. Optional repeated reads use a 0.1 s interval; no calibration or zeroing is requested.",
+        "connection": "control",
+        "language_notes": {}
+      }
+    },
+    {
+      "task": "basic_examples/sensors/read_hand_touch_forces",
+      "python": "vega_1/python/basic_examples/sensors/read_hand_touch_forces.py",
+      "cpp": "vega_1/cpp/basic_examples/sensors/read_hand_touch_forces.cpp",
+      "rust": "vega_1/rust/src/basic_examples/sensors/read_hand_touch_forces.rs",
+      "rust_bin": "sensor-read-hand-touch-forces",
+      "simulation": true,
+      "cli_cpp": [
+        "period",
+        "samples",
+        "side"
+      ],
+      "cli_rust": [
+        "period",
+        "samples",
+        "side"
+      ],
+      "behavior": {
+        "summary": "Read and print fingertip forces from one hand.",
+        "default": "Read the right hand once by default and report missing touch data. Optional repeated reads use a 0.1 s interval.",
+        "connection": "control",
+        "language_notes": {}
+      }
+    },
+    {
+      "task": "basic_examples/sensors/monitor_head_camera",
+      "python": "vega_1/python/basic_examples/sensors/monitor_head_camera.py",
+      "cpp": "vega_1/cpp/basic_examples/sensors/monitor_head_camera.cpp",
+      "rust": "vega_1/rust/src/basic_examples/sensors/monitor_head_camera.rs",
+      "rust_bin": "sensor-monitor-head-camera",
+      "simulation": true,
+      "cli_cpp": [
+        "period",
+        "samples",
+        "sensor",
+        "stream"
+      ],
+      "cli_rust": [
+        "period",
+        "samples",
+        "sensor",
+        "stream"
+      ],
+      "behavior": {
+        "summary": "Monitor frames from the configured head camera.",
+        "default": "Enable head_camera, subscribe to all advertised streams unless selected with --stream, and poll 200 times at 30 Hz before unsubscribing. The sensor name is configurable; no particular camera brand is required and no image files are saved.",
+        "connection": "control",
+        "language_notes": {
+          "python": "Starts/connects a Rerun viewer by default; --no-display prints instead. Missing rerun-sdk falls back to printing.",
+          "cpp": "Prints numeric summaries/frame metadata; does not open a viewer.",
+          "rust": "Prints numeric summaries/frame metadata; does not open a viewer."
+        }
+      }
+    },
+    {
+      "task": "basic_examples/sensors/read_imu_states",
+      "python": "vega_1/python/basic_examples/sensors/read_imu_states.py",
+      "cpp": "vega_1/cpp/basic_examples/sensors/read_imu_states.cpp",
+      "rust": "vega_1/rust/src/basic_examples/sensors/read_imu_states.rs",
+      "rust_bin": "sensor-read-imu-states",
+      "simulation": true,
+      "cli_cpp": [
+        "period",
+        "samples",
+        "sensor"
+      ],
+      "cli_rust": [
+        "period",
+        "samples",
+        "sensor"
+      ],
+      "behavior": {
+        "summary": "Read and print observations from configured IMUs.",
+        "default": "Read head_imu and chassis_imu once by default, waiting up to 5 s for activity. --sensor changes the requested list; optional repeated reads use a 0.1 s interval.",
+        "connection": "control",
+        "language_notes": {
+          "python": "Requested IMUs are passed to Robot before filtering; an undeclared sensor can fail connection.",
+          "cpp": "Filters undeclared IMU names before connecting.",
+          "rust": "Filters undeclared IMU names before connecting."
+        }
+      }
+    },
+    {
+      "task": "basic_examples/sensors/monitor_2d_lidar_scans",
+      "python": "vega_1/python/basic_examples/sensors/monitor_2d_lidar_scans.py",
+      "cpp": "vega_1/cpp/basic_examples/sensors/monitor_2d_lidar_scans.cpp",
+      "rust": "vega_1/rust/src/basic_examples/sensors/monitor_2d_lidar_scans.rs",
+      "rust_bin": "sensor-monitor-2d-lidar-scans",
+      "simulation": true,
+      "cli_cpp": [
+        "period",
+        "samples",
+        "sensor"
+      ],
+      "cli_rust": [
+        "period",
+        "samples",
+        "sensor"
+      ],
+      "behavior": {
+        "summary": "Monitor a bounded sequence of 2D LiDAR scans.",
+        "default": "Enable lidar_2d_front, wait up to 10 s for activity, and poll 200 times at 0.1 s intervals. Display XY points or range summaries; no scan file is saved.",
+        "connection": "control",
+        "language_notes": {
+          "python": "Starts/connects a Rerun viewer by default; --no-display prints instead. Missing rerun-sdk falls back to printing.",
+          "cpp": "Prints numeric summaries/frame metadata; does not open a viewer.",
+          "rust": "Prints numeric summaries/frame metadata; does not open a viewer."
+        }
+      }
+    },
+    {
+      "task": "basic_examples/sensors/read_joint_states",
+      "python": "vega_1/python/basic_examples/sensors/read_joint_states.py",
+      "cpp": "vega_1/cpp/basic_examples/sensors/read_joint_states.cpp",
+      "rust": "vega_1/rust/src/basic_examples/sensors/read_joint_states.rs",
+      "rust_bin": "sensor-read-joint-states",
+      "simulation": true,
+      "cli_cpp": [
+        "component"
+      ],
+      "cli_rust": [
+        "component"
+      ],
+      "behavior": {
+        "summary": "Print current joint states and chassis state.",
+        "default": "Read all available joint components once, skipping unavailable joint state; --component narrows that list. Also print chassis state when available, independently of the component filter. This is a cached state listing, not a complete diagnostic report.",
+        "connection": "control",
+        "language_notes": {
+          "python": "Prints named joint rows with model-derived units; unavailable fields appear as \u2014. Chassis steering, wheel encoder positions and wheel speeds are listed separately. Reports nonempty joint error indices by name.",
+          "cpp": "Prints named joint rows with model-derived units; unavailable fields appear as \u2014. Chassis steering, wheel encoder positions and wheel speeds are listed separately.",
+          "rust": "Prints named joint rows with model-derived units; unavailable fields appear as \u2014. Chassis steering, wheel encoder positions and wheel speeds are listed separately. Reports nonempty joint error indices."
+        }
+      }
+    },
+    {
+      "task": "basic_examples/sensors/read_component_temperatures",
+      "python": "vega_1/python/basic_examples/sensors/read_component_temperatures.py",
+      "cpp": "vega_1/cpp/basic_examples/sensors/read_component_temperatures.cpp",
+      "rust": "vega_1/rust/src/basic_examples/sensors/read_component_temperatures.rs",
+      "rust_bin": "sensor-read-component-temperatures",
+      "simulation": true,
+      "cli_cpp": [
+        "component"
+      ],
+      "cli_rust": [
+        "component"
+      ],
+      "behavior": {
+        "summary": "Print component temperatures and battery status.",
+        "default": "Read each available component temperature stream once, then battery temperature/status. --component narrows component selection; battery reporting is separate. Report unavailable temperature sources.",
+        "connection": "control",
+        "language_notes": {}
+      }
+    },
+    {
+      "task": "basic_examples/sensors/read_ultrasonic_ranges",
+      "python": "vega_1/python/basic_examples/sensors/read_ultrasonic_ranges.py",
+      "cpp": "vega_1/cpp/basic_examples/sensors/read_ultrasonic_ranges.cpp",
+      "rust": "vega_1/rust/src/basic_examples/sensors/read_ultrasonic_ranges.rs",
+      "rust_bin": "sensor-read-ultrasonic-ranges",
+      "simulation": true,
+      "cli_cpp": [
+        "period",
+        "samples",
+        "sensor"
+      ],
+      "cli_rust": [
+        "period",
+        "samples",
+        "sensor"
+      ],
+      "behavior": {
+        "summary": "Read and print ultrasonic ranges.",
+        "default": "Enable ultrasonic, wait up to 5 s for activity, and print one observation by default. Optional repeated reads use a 0.1 s interval.",
+        "connection": "control",
+        "language_notes": {}
+      }
+    },
+    {
+      "task": "basic_examples/sensors/monitor_wrist_cameras",
+      "python": "vega_1/python/basic_examples/sensors/monitor_wrist_cameras.py",
+      "cpp": "vega_1/cpp/basic_examples/sensors/monitor_wrist_cameras.cpp",
+      "rust": "vega_1/rust/src/basic_examples/sensors/monitor_wrist_cameras.rs",
+      "rust_bin": "sensor-monitor-wrist-cameras",
+      "simulation": true,
+      "cli_cpp": [
+        "period",
+        "samples",
+        "sensor",
+        "stream"
+      ],
+      "cli_rust": [
+        "period",
+        "samples",
+        "sensor",
+        "stream"
+      ],
+      "behavior": {
+        "summary": "Monitor frames from the configured wrist cameras.",
+        "default": "Enable left_wrist_camera and right_wrist_camera unless --sensor supplies names. Subscribe to selected/all advertised streams, poll 200 times at 30 Hz, then unsubscribe. No particular camera brand is required and no image files are saved.",
+        "connection": "control",
+        "language_notes": {
+          "python": "Starts/connects a Rerun viewer by default; --no-display prints instead. Missing rerun-sdk falls back to printing.",
+          "cpp": "Prints numeric summaries/frame metadata; does not open a viewer.",
+          "rust": "Prints numeric summaries/frame metadata; does not open a viewer."
+        }
+      }
+    },
+    {
+      "task": "benchmark/arm_tracking/benchmark_arm_sine",
+      "python": "vega_1/python/benchmark/arm_tracking/benchmark_arm_sine.py",
+      "cpp": "vega_1/cpp/benchmark/arm_tracking/benchmark_arm_sine.cpp",
+      "rust": "vega_1/rust/src/benchmark/arm_tracking/benchmark_arm_sine.rs",
+      "rust_bin": "benchmark-arm-sine",
+      "simulation": true,
+      "cli_cpp": [
+        "amplitude",
+        "control-hz",
+        "duration",
+        "no-confirm",
+        "output-dir",
+        "settle",
+        "side",
+        "sin-frequency"
+      ],
+      "cli_rust": [
+        "amplitude",
+        "control-hz",
+        "duration",
+        "no-confirm",
+        "output-dir",
+        "settle",
+        "side",
+        "sin-frequency",
+        "timeout"
+      ],
+      "behavior": {
+        "summary": "Benchmark each arm joint with a sine trajectory and velocity feed-forward.",
+        "default": "Prompt for confirmation unless --no-confirm; move the right seven-joint arm to [0,0,0,-0.5,0,0,0] rad. Test each joint for 10 s at 200 Hz with a 0.4 rad, 1 Hz sine; return to the reference between joints and at the end. Write measurement files. This reference is not an all-zero pose. The amplitude is fitted to each joint's limits: the position limits from the reference pose and the velocity limit against the feed-forward peak (amplitude times angular frequency), reduced with a warning where the requested amplitude does not fit. Stream with the step guard disabled (tracking lag is what is measured).",
+        "connection": "control",
+        "language_notes": {
+          "python": "Writes per-joint CSV, data.npz and summary.png under results beside this script; requires matplotlib.",
+          "cpp": "Writes per-joint CSV and parameters.txt under the requested output directory.",
+          "rust": "Writes per-joint CSV and prints tracking errors; no plots/NPZ. --timeout controls managed-motion waits."
+        }
+      }
+    },
+    {
+      "task": "benchmark/arm_tracking/benchmark_arm_step",
+      "python": "vega_1/python/benchmark/arm_tracking/benchmark_arm_step.py",
+      "cpp": "vega_1/cpp/benchmark/arm_tracking/benchmark_arm_step.cpp",
+      "rust": "vega_1/rust/src/benchmark/arm_tracking/benchmark_arm_step.rs",
+      "rust_bin": "benchmark-arm-step",
+      "simulation": true,
+      "cli_cpp": [
+        "control-hz",
+        "duration",
+        "max-vel",
+        "no-confirm",
+        "output-dir",
+        "settle",
+        "side",
+        "step-amplitude",
+        "step-time",
+        "transition-time"
+      ],
+      "cli_rust": [
+        "control-hz",
+        "duration",
+        "max-vel",
+        "no-confirm",
+        "output-dir",
+        "settle",
+        "side",
+        "step-amplitude",
+        "step-time",
+        "timeout",
+        "transition-time"
+      ],
+      "behavior": {
+        "summary": "Benchmark each arm joint with a ramped step trajectory.",
+        "default": "Prompt unless --no-confirm; move the right seven-joint arm to [0,0,0,-0.5,0,0,0] rad. Test each joint for 5 s at 200 Hz: hold 0.3 s, ramp by pi/6 rad over 0.3 s, then hold. The step is fitted to each joint's limits from the reference pose: the other direction where the requested one does not fit, a smaller step where neither does, each logged. Stream positions without velocity feed-forward and with the step guard disabled (tracking lag is what is measured); return to the reference between joints and at the end. Write measurement files.",
+        "connection": "control",
+        "language_notes": {
+          "python": "Writes per-joint CSV, data.npz and summary.png under results beside this script; requires matplotlib.",
+          "cpp": "Writes per-joint CSV and parameters.txt under the requested output directory.",
+          "rust": "Writes per-joint CSV and prints tracking errors; returns to the reference after each joint, with no plots/NPZ."
+        }
+      }
+    },
+    {
+      "task": "benchmark/connection/benchmark_connection_latency",
+      "python": "vega_1/python/benchmark/connection/benchmark_connection_latency.py",
+      "cpp": "vega_1/cpp/benchmark/connection/benchmark_connection_latency.cpp",
+      "rust": "vega_1/rust/src/benchmark/connection/benchmark_connection_latency.rs",
+      "rust_bin": "benchmark-connection-latency",
+      "simulation": true,
+      "cli_cpp": [
+        "samples",
+        "timeout"
+      ],
+      "cli_rust": [
+        "samples"
+      ],
+      "behavior": {
+        "summary": "Measure full Robot connection time and query round-trip latency.",
+        "default": "Create one control connection, then issue 10 version_info queries and print timing statistics. This includes normal Robot startup/cleanup side effects; it is not a read-only DiagnosticClient benchmark.",
+        "connection": "control",
+        "language_notes": {
+          "python": "Also waits for active state (10 s default timeout) before finishing the connection timer.",
+          "cpp": "Also waits for active state (10 s default timeout) before finishing the connection timer.",
+          "rust": "Times builder completion; no separate --timeout/active-state wait."
+        }
+      }
+    },
+    {
+      "task": "troubleshooting/measure_robot_clock_offset",
+      "python": "vega_1/python/troubleshooting/measure_robot_clock_offset.py",
+      "cpp": "vega_1/cpp/troubleshooting/measure_robot_clock_offset.cpp",
+      "rust": "vega_1/rust/src/troubleshooting/measure_robot_clock_offset.rs",
+      "rust_bin": "troubleshooting-measure-robot-clock-offset",
+      "simulation": false,
+      "cli_cpp": [
+        "samples"
+      ],
+      "cli_rust": [
+        "samples"
+      ],
+      "behavior": {
+        "summary": "Estimate robot clock offset and network round-trip time.",
+        "default": "Use a read-only DiagnosticClient to collect 30 time-query samples and report server-minus-client offset, round-trip time, and replies. Does not synchronize or change either clock; no simulation connection is supported.",
+        "connection": "diagnostic",
+        "language_notes": {
+          "python": "Human-readable signed offset and RTT in milliseconds.",
+          "cpp": "Prints diagnostic JSON.",
+          "rust": "Pretty-printed diagnostic JSON."
+        }
+      }
+    },
+    {
+      "task": "troubleshooting/clear_component_errors",
+      "python": "vega_1/python/troubleshooting/clear_component_errors.py",
+      "cpp": "vega_1/cpp/troubleshooting/clear_component_errors.cpp",
+      "rust": "vega_1/rust/src/troubleshooting/clear_component_errors.rs",
+      "rust_bin": "troubleshooting-clear-component-errors",
+      "simulation": true,
+      "cli_cpp": [],
+      "cli_rust": [],
+      "behavior": {
+        "summary": "Clear errors on all supported robot components.",
+        "default": "Send clear-error requests, print each component outcome, and exit nonzero if any outcome failed. This is a mutating maintenance operation.",
+        "connection": "control",
+        "language_notes": {}
+      }
+    },
+    {
+      "task": "troubleshooting/display_robot_info",
+      "python": "vega_1/python/troubleshooting/display_robot_info.py",
+      "cpp": "vega_1/cpp/troubleshooting/display_robot_info.cpp",
+      "rust": "vega_1/rust/src/troubleshooting/display_robot_info.rs",
+      "rust_bin": "troubleshooting-display-robot-info",
+      "simulation": false,
+      "cli_cpp": [
+        "settle-timeout"
+      ],
+      "cli_rust": [
+        "settle-timeout"
+      ],
+      "behavior": {
+        "summary": "Display robot topology, observed state, and server diagnostics.",
+        "default": "Use a read-only DiagnosticClient and a 0.25 s state observation window, then print the snapshot. Optional --enable-sensor includes declared optional sensors. Does not enable motors or issue stop/motion commands; no simulation connection is supported.",
+        "connection": "diagnostic",
+        "language_notes": {
+          "python": "Formatted tables, optionally using Rich.",
+          "cpp": "Formatted native diagnostic tables.",
+          "rust": "Formatted native diagnostic tables."
+        }
+      }
+    }
+  ],
+  "python_only": [
+    "vega_1/python/advanced_examples/run_cartesian_admittance.py",
+    "vega_1/python/advanced_examples/plan_arm_pose.py",
+    "vega_1/python/advanced_examples/offset_end_effectors.py",
+    "vega_1/python/basic_examples/sensors/_viewer.py",
+    "vega_1/python/benchmark/arm_tracking/_tracking_helpers.py",
+    "vega_1/python/benchmark/connection/stress_heartbeat_gil.py",
+    "vega_1/python/teleop/gamepad_arm_cartesian_control.py",
+    "vega_1/python/teleop/gamepad_arm_joint_control.py",
+    "vega_1/python/teleop/_arm_teleop_base.py",
+    "vega_1/python/teleop/gamepad_chassis_head.py",
+    "vega_1/python/teleop/_dualsense_teleop_base.py"
+  ],
+  "rust_helpers": [
+    "vega_1/rust/src/lib.rs",
+    "vega_1/rust/src/diagnostic_display.rs"
+  ],
+  "python_only_behavior": {
+    "vega_1/python/advanced_examples/run_cartesian_admittance.py": {
+      "summary": "Run wrench-based Cartesian admittance on both arms until interrupted.",
+      "default": "Uses dexmotion inverse kinematics and both arm wrench streams. Default gain is 1.0, zero-force mode is enabled, and no blue-button gate is required unless --need-button is set. Streams direct joint targets until Ctrl-C, then requests shutdown. Uses a real Robot control connection with normal startup side effects; no simulation flag.",
+      "connection": "control"
+    },
+    "vega_1/python/advanced_examples/plan_arm_pose.py": {
+      "summary": "Plan and execute a both-arm named-pose move with dexmotion.",
+      "default": "Connect to the real robot and build a geometry-aware OMPL plan to L_shape with torso-pitch compensation, sampled at 250 Hz. If initially self-colliding, propose a separate escape interpolation and require confirmation. Require confirmation before executing the final path; the dexmotion viewer is on by default (--no-visualize turns it off). Collision checking covers the configured model, not a guarantee about the physical workspace. No simulation flag.",
+      "connection": "control"
+    },
+    "vega_1/python/advanced_examples/offset_end_effectors.py": {
+      "summary": "Execute four planned relative end-effector moves with Enter prompts.",
+      "default": "Using dexmotion at 250 Hz: move the right end effector +0.1 m in z in frame R_arm_j5; move the left +0.1 m in y; move the left +0.1 m in x in frame L_arm_j3; rotate the right +pi/4 around x. Prompt before each segment and stream both arm joint arrays. Uses a real Robot control connection; no simulation flag.",
+      "connection": "control"
+    },
+    "vega_1/python/basic_examples/sensors/_viewer.py": {
+      "summary": "Shared Rerun display helpers; not an executable example.",
+      "default": "Imported by sensor/current scripts. start() opens/connects a viewer unless --no-display is set; missing rerun-sdk falls back to printing. Running this module directly starts no viewer or robot connection.",
+      "connection": "helper"
+    },
+    "vega_1/python/benchmark/arm_tracking/_tracking_helpers.py": {
+      "summary": "Shared seven-joint tracking reference, CSV, and validation helpers.",
+      "default": "Imported by arm benchmarks; the reference vector is [0,0,0,-0.5,0,0,0] rad. Contains no standalone benchmark or robot connection.",
+      "connection": "helper"
+    },
+    "vega_1/python/benchmark/connection/stress_heartbeat_gil.py": {
+      "summary": "Monitor heartbeat status while creating Python GIL contention.",
+      "default": "For 30 s, start four CPU-bound worker threads by default and increase the Python thread switch interval to 0.1 s. Display a Rich heartbeat table; stop workers and restore the interval on normal cleanup. --no-gil-stress disables the load; --disable-heartbeat changes heartbeat policy. Uses a real Robot control connection, not read-only diagnostics; no motion benchmark and no simulation flag.",
+      "connection": "control"
+    },
+    "vega_1/python/teleop/gamepad_arm_cartesian_control.py": {
+      "summary": "Control arm end-effector translation and rotation with a DualSense gamepad.",
+      "default": "Select the left arm initially; L1 gates interactive movement, R1 switches arms, and R2 toggles translation/rotation mode. Run dexmotion IK and stream arm targets at 400 Hz until interrupted. The arm IK helper pauses the SDK heartbeat monitor and resumes it on cleanup. Uses a real Robot control connection; no simulation flag.",
+      "connection": "control"
+    },
+    "vega_1/python/teleop/gamepad_arm_joint_control.py": {
+      "summary": "Open available hands, then control arm joints with a DualSense gamepad.",
+      "default": "Open both available hands before the interactive loop, without requiring L1 for this startup action. Select the left arm initially; L1 gates subsequent joint jogging, R1 switches arms, and face buttons/L2 select joints. Runs until interrupted at 200 Hz by default. Uses dexmotion, pauses the SDK heartbeat monitor in the arm IK helper, resumes it on cleanup, and shuts down the real Robot. No simulation flag.",
+      "connection": "control"
+    },
+    "vega_1/python/teleop/_arm_teleop_base.py": {
+      "summary": "Shared arm teleoperation and dexmotion IK helpers; not an executable example.",
+      "default": "Import support for the two arm gamepad scripts. Object construction can connect a Robot and pauses its heartbeat monitor after IK setup; arm cleanup resumes it. Running this module directly defines classes but starts no control loop.",
+      "connection": "helper"
+    },
+    "vega_1/python/teleop/gamepad_chassis_head.py": {
+      "summary": "Move the head home, then control chassis and head with a DualSense gamepad.",
+      "default": "At startup, send a torso-pitch-compensated head home target before L1 is pressed. Then use L1-gated chassis/head control at 400 Hz; default maximum linear/angular speeds are 0.5 m/s and 1 rad/s. Touchpad toggles E-stop; the head-mode control can enable/disable head motors. Runs until interrupted, then requests stop/shutdown. Real Robot connection; no simulation flag.",
+      "connection": "control"
+    },
+    "vega_1/python/teleop/_dualsense_teleop_base.py": {
+      "summary": "Shared DualSense connection, button mapping, and cleanup helpers.",
+      "default": "Imported by gamepad examples. Instantiation activates the controller and connects a Robot; L1 manages interactive movement state and touchpad toggles software E-stop. Running this module directly defines classes but starts no control loop.",
+      "connection": "helper"
+    }
+  },
+  "auxiliary_programs": []
+}

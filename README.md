@@ -24,11 +24,11 @@ Download a release from [GitHub Releases](https://github.com/dexmate-ai/dexcontr
 or clone the matching version of this repository:
 
 ```bash
-git clone --branch v0.7.7-rc.2 https://github.com/dexmate-ai/dexcontrol.git
+git clone --branch v0.7.7-rc.4 https://github.com/dexmate-ai/dexcontrol.git
 cd dexcontrol
 ```
 
-This release candidate uses `0.7.7rc2` on PyPI and `0.7.7-rc.2` for Rust and
+This release candidate uses `0.7.7rc4` on PyPI and `0.7.7-rc.4` for Rust and
 the native SDK. Keep the repository, Python package, native SDK, and Rust
 dependency on the same release.
 Run the example commands from the repository root.
@@ -62,6 +62,35 @@ running. `--dry-run` prints commands without building or running. Put launcher
 options before the example name; anything after it is passed to the example.
 The included `read_joint_positions` example always uses simulation.
 
+## Full example suite
+
+The complete [examples directory](examples/) is included: Python, C++, Rust,
+shared helpers, task descriptions, fixtures, and the Vega dance recording.
+See [example behavior](examples/BEHAVIOR.md) before running a task.
+
+Python and C++ tasks can be selected by filename without its extension:
+
+```bash
+python -m pip install 'dexcontrol[examples]==0.7.7rc4'
+./run python cycle_arm --simulated --profile vega_1 --delta 0.01
+./run cpp cycle_arm --simulated --profile vega_1 --delta 0.01
+./run python replay_trajectory --help
+```
+
+Most full-suite examples select real hardware unless `--simulated` is given.
+Planning and teleoperation programs require the dependencies and hardware
+listed in their individual documentation. Listing or displaying help does
+not run a motion.
+
+The full Rust suite uses the public `dexcontrol` crate and precompiled native
+SDK. It requires no private repositories. For example:
+
+```bash
+./run rust cycle_arm --simulated --profile vega_1 --delta 0.01
+./run rust read_battery_status --simulated --profile vega_1
+./run rust --list
+```
+
 ## Python
 
 Requires Python 3.8 or newer. Wheels are available for Linux x86_64/ARM64 and
@@ -70,7 +99,7 @@ macOS Intel/Apple Silicon. No C++ or Rust compiler is needed.
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-python -m pip install dexcontrol==0.7.7rc2
+python -m pip install dexcontrol==0.7.7rc4
 ./run python read_joint_positions
 ```
 
@@ -119,8 +148,8 @@ For example, on Linux x86_64, place both downloads in the repository root:
 
 ```bash
 sha256sum --ignore-missing -c SHA256SUMS
-python3 install_sdk.py dexcontrol-sdk-v0.7.7-rc.2-linux-x86_64.tar.gz "$HOME/.local/dexcontrol/0.7.7-rc.2"
-source "$HOME/.local/dexcontrol/0.7.7-rc.2/activate"
+python3 install_sdk.py dexcontrol-sdk-v0.7.7-rc.4-linux-x86_64.tar.gz "$HOME/.local/dexcontrol/0.7.7-rc.4"
+source "$HOME/.local/dexcontrol/0.7.7-rc.4/activate"
 ```
 
 On macOS, use `shasum -a 256 <archive>` and compare the digest with the matching
@@ -206,7 +235,7 @@ For your own application:
 ```bash
 cargo new my_robot
 cd my_robot
-cargo add dexcontrol@=0.7.7-rc.2
+cargo add dexcontrol@=0.7.7-rc.4
 ```
 
 Replace `src/main.rs` with:
@@ -229,6 +258,19 @@ fn main() -> dexcontrol::Result<()> {
 ```
 
 Run it with `cargo run`.
+
+The Rust API also provides `WaitOptions` (tolerance and settling), motion groups,
+recorded trajectories, named chassis control, firmware services, E-stop status,
+battery/IMU/LiDAR/camera reads, `DiagnosticClient`, and `RateLimiter`.
+Use `cargo doc --open` in your application for signatures and ownership rules.
+Sensor snapshots own their data; borrowed channels remain valid while the
+snapshot is alive. SDK calls are synchronous; async applications should run
+blocking operations on a worker thread.
+
+Simulation supports motion and sensor-state testing. It does not supply camera
+images or firmware replies for PID, brakes, baud rate, force-torque modes,
+reboot, or clear-error requests. Those examples report the unavailable service;
+read-only diagnostic examples require a real robot.
 
 ## Basic API
 

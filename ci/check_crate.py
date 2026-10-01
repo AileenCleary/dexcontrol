@@ -29,7 +29,8 @@ def check(path, version, source_root=None):
             raise ValueError("Unexpected API crate name/version")
         allowed = common | {"build.rs", "header.sha256", "src/ffi/mod.rs",
                             "src/ffi/bindings.rs", "src/ffi/constants.rs",
-                            "examples/read_joint_positions.rs"}
+                            "examples/read_joint_positions.rs",
+                            "src/component.rs", "src/diagnostics.rs", "src/motion.rs", "src/options.rs", "src/robot.rs", "src/sensors.rs"}
         found = {}
         for member in members:
             parts = PurePosixPath(member.name).parts

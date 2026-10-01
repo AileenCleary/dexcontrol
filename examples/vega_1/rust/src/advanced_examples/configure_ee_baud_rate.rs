@@ -1,0 +1,47 @@
+// Copyright (C) 2026 Dexmate Inc.
+//
+// This software is dual-licensed:
+//
+// 1. GNU Affero General Public License v3.0 (AGPL-3.0)
+//    See LICENSE-AGPL for details
+//
+// 2. Commercial License
+//    For commercial licensing terms, contact: contact@dexmate.ai
+
+//! Read or set end-effector RS485 baud rates.
+//!
+//! Require positional get or set. Address both arm end-effector interfaces by default; set uses 115200 baud unless overridden. Print service replies.
+//!
+//! Uses a Robot control connection: compatible arm modes may be enabled during startup, and shutdown requests a stop. Real hardware is selected unless --simulated is supplied.
+
+use dexcontrol_examples::{component_name, invalid, Args, Result};
+
+#[tokio::main]
+async fn main() -> Result {
+    let args = Args::parse(
+        "Read or set end-effector RS485 baud rates. Require positional get or set. Address both arm end-effector interfaces by default; set uses 115200 baud unless overridden. Print service replies. Uses a Robot control connection: compatible arm modes may be enabled during startup, and shutdown requests a stop. Real hardware is selected unless --simulated is supplied.",
+        &["baud-rate", "side"],
+    );
+    let action = args.positional(0, "");
+    if action != "get" && action != "set" {
+        return Err(invalid("action must be get or set"));
+    }
+    let baud_rate = u32::try_from(args.integer("baud-rate", 115_200)?)?;
+    let robot = args.connect(&[]).await?;
+    dexcontrol_examples::run_robot(&robot, async {
+        for side in args.sides()? {
+            let arm = robot.joints(&component_name(side, "arm"))?;
+            let result = if action == "get" {
+                arm.ee_baud_rate()?
+            } else {
+                arm.set_ee_baud_rate(baud_rate)?
+            };
+            println!(
+                "{side}_arm\n{}",
+                serde_json::to_string_pretty(&serde_json::from_str::<serde_json::Value>(&result)?)?
+            );
+        }
+        Ok(())
+    })
+    .await
+}

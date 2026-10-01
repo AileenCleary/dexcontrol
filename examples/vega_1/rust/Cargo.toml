@@ -1,0 +1,209 @@
+# Copyright (C) 2026 Dexmate Inc.
+#
+# This software is dual-licensed:
+#
+# 1. GNU Affero General Public License v3.0 (AGPL-3.0)
+#    See LICENSE-AGPL for details
+#
+# 2. Commercial License
+#    For commercial licensing terms, contact: contact@dexmate.ai
+
+[package]
+name = "dexcontrol-examples"
+version = "0.7.7-rc.4"
+edition = "2021"
+rust-version = "1.90"
+license = "AGPL-3.0-only OR LicenseRef-Dexmate-Commercial"
+publish = false
+autobins = false
+
+[dependencies]
+dexcontrol = { path = "../../../rust/dexcontrol" }
+serde_json = "1"
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "signal", "sync", "time"] }
+
+[workspace]
+
+[[bin]]
+name = "control-close-hand"
+path = "src/basic_examples/control/close_hand.rs"
+
+[[bin]]
+name = "control-set-head-motor-mode"
+path = "src/basic_examples/control/set_head_motor_mode.rs"
+
+[[bin]]
+name = "control-cycle-arm"
+path = "src/basic_examples/control/cycle_arm.rs"
+
+[[bin]]
+name = "control-exercise-chassis"
+path = "src/basic_examples/control/exercise_chassis.rs"
+
+[[bin]]
+name = "control-cycle-hand"
+path = "src/basic_examples/control/cycle_hand.rs"
+
+[[bin]]
+name = "control-sweep-head-joints"
+path = "src/basic_examples/control/sweep_head_joints.rs"
+
+[[bin]]
+name = "control-cycle-torso"
+path = "src/basic_examples/control/cycle_torso.rs"
+
+[[bin]]
+name = "control-open-hand"
+path = "src/basic_examples/control/open_hand.rs"
+
+[[bin]]
+name = "sensor-read-2d-lidar-scan"
+path = "src/basic_examples/sensors/read_2d_lidar_scan.rs"
+
+[[bin]]
+name = "sensor-monitor-3d-lidar-points"
+path = "src/basic_examples/sensors/monitor_3d_lidar_points.rs"
+
+[[bin]]
+name = "sensor-monitor-lidar-imu"
+path = "src/basic_examples/sensors/monitor_lidar_imu.rs"
+
+[[bin]]
+name = "sensor-read-arm-buttons"
+path = "src/basic_examples/sensors/read_arm_buttons.rs"
+
+[[bin]]
+name = "sensor-read-battery-status"
+path = "src/basic_examples/sensors/read_battery_status.rs"
+
+[[bin]]
+name = "sensor-monitor-chassis-cameras"
+path = "src/basic_examples/sensors/monitor_chassis_cameras.rs"
+
+[[bin]]
+name = "sensor-read-arm-force-torque"
+path = "src/basic_examples/sensors/read_arm_force_torque.rs"
+
+[[bin]]
+name = "sensor-read-hand-touch-forces"
+path = "src/basic_examples/sensors/read_hand_touch_forces.rs"
+
+[[bin]]
+name = "sensor-monitor-head-camera"
+path = "src/basic_examples/sensors/monitor_head_camera.rs"
+
+[[bin]]
+name = "sensor-read-imu-states"
+path = "src/basic_examples/sensors/read_imu_states.rs"
+
+[[bin]]
+name = "sensor-monitor-2d-lidar-scans"
+path = "src/basic_examples/sensors/monitor_2d_lidar_scans.rs"
+
+[[bin]]
+name = "sensor-read-joint-states"
+path = "src/basic_examples/sensors/read_joint_states.rs"
+
+[[bin]]
+name = "sensor-read-component-temperatures"
+path = "src/basic_examples/sensors/read_component_temperatures.rs"
+
+[[bin]]
+name = "sensor-read-ultrasonic-ranges"
+path = "src/basic_examples/sensors/read_ultrasonic_ranges.rs"
+
+[[bin]]
+name = "sensor-monitor-wrist-cameras"
+path = "src/basic_examples/sensors/monitor_wrist_cameras.rs"
+
+[[bin]]
+name = "troubleshooting-measure-robot-clock-offset"
+path = "src/troubleshooting/measure_robot_clock_offset.rs"
+
+[[bin]]
+name = "troubleshooting-clear-component-errors"
+path = "src/troubleshooting/clear_component_errors.rs"
+
+[[bin]]
+name = "troubleshooting-display-robot-info"
+path = "src/troubleshooting/display_robot_info.rs"
+
+[[bin]]
+name = "advanced-steer-chassis-sine"
+path = "src/advanced_examples/steer_chassis_sine.rs"
+
+[[bin]]
+name = "advanced-configure-arm-pid"
+path = "src/advanced_examples/configure_arm_pid.rs"
+
+[[bin]]
+name = "advanced-configure-ee-baud-rate"
+path = "src/advanced_examples/configure_ee_baud_rate.rs"
+
+[[bin]]
+name = "advanced-configure-arm-ft-sensor"
+path = "src/advanced_examples/configure_arm_ft_sensor.rs"
+
+[[bin]]
+name = "advanced-send-end-effector-bytes"
+path = "src/advanced_examples/send_end_effector_bytes.rs"
+
+[[bin]]
+name = "advanced-manage-arm-brakes"
+path = "src/advanced_examples/manage_arm_brakes.rs"
+
+[[bin]]
+name = "advanced-monitor-joint-currents"
+path = "src/advanced_examples/monitor_joint_currents.rs"
+
+[[bin]]
+name = "advanced-estop-robot"
+path = "src/advanced_examples/estop_robot.rs"
+
+[[bin]]
+name = "advanced-pose-both-arms"
+path = "src/advanced_examples/pose_both_arms.rs"
+
+[[bin]]
+name = "advanced-fold-or-unfold-robot"
+path = "src/advanced_examples/fold_or_unfold_robot.rs"
+
+[[bin]]
+name = "advanced-pose-arms-sequentially"
+path = "src/advanced_examples/pose_arms_sequentially.rs"
+
+[[bin]]
+name = "advanced-pose-arm"
+path = "src/advanced_examples/move_to_pose/pose_arm.rs"
+
+[[bin]]
+name = "advanced-pose-head"
+path = "src/advanced_examples/move_to_pose/pose_head.rs"
+
+[[bin]]
+name = "advanced-pose-torso"
+path = "src/advanced_examples/move_to_pose/pose_torso.rs"
+
+[[bin]]
+name = "advanced-reboot-control-board"
+path = "src/advanced_examples/reboot_control_board.rs"
+
+[[bin]]
+name = "benchmark-connection-latency"
+path = "src/benchmark/connection/benchmark_connection_latency.rs"
+
+[[bin]]
+name = "advanced-keyboard-jog-joint"
+path = "src/advanced_examples/keyboard_jog_joint.rs"
+
+[[bin]]
+name = "advanced-replay-trajectory"
+path = "src/advanced_examples/replay_trajectory.rs"
+
+[[bin]]
+name = "benchmark-arm-sine"
+path = "src/benchmark/arm_tracking/benchmark_arm_sine.rs"
+
+[[bin]]
+name = "benchmark-arm-step"
+path = "src/benchmark/arm_tracking/benchmark_arm_step.rs"

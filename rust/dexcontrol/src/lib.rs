@@ -19,6 +19,19 @@
 //! use dexcontrol::ffi::dex_robot_create;
 //! ```
 mod ffi;
+mod options;
+use options::duration_ms;
+pub use options::*;
+mod component;
+pub use component::*;
+mod robot;
+pub use robot::*;
+mod sensors;
+pub use sensors::*;
+mod motion;
+pub use motion::*;
+mod diagnostics;
+pub use diagnostics::*;
 use std::{
     ffi::{CStr, CString},
     ptr::{self, NonNull},
@@ -118,17 +131,23 @@ impl Wait {
         Ok(wait)
     }
 }
-/// Motion planning options. Joint limits remain enforced.
+/// Motion planning options. Joint limits are enforced by default.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct MotionOptions {
     pub relative: bool,
     pub velocity_scale: Option<f64>,
+    pub disable_limit_enforcement: bool,
+    pub max_state_age: DurationLimit,
+    pub wait_ceiling: DurationLimit,
 }
 impl MotionOptions {
     fn native(self) -> Result<ffi::dex_motion_options_t> {
         let mut options = ffi::dex_motion_options_t::default();
         unsafe { ffi::dex_motion_options_init(&mut options) };
         options.relative = u8::from(self.relative);
+        options.disable_limit_enforcement = self.disable_limit_enforcement.into();
+        options.max_state_age_ms = self.max_state_age.native()?;
+        options.wait_ceiling_ms = self.wait_ceiling.native()?;
         if let Some(scale) = self.velocity_scale {
             if !scale.is_finite() || scale <= 0.0 || scale > 1.0 {
                 return Err(invalid("velocity_scale must be finite and in (0, 1]"));
@@ -144,38 +163,29 @@ pub struct ConnectOptions<'a> {
     pub profile: Option<&'a str>,
     pub config_file: Option<&'a str>,
     pub simulated: bool,
+    pub enable_sensors: Vec<&'a str>,
+    pub require_version_check: bool,
+    pub disable_watchdog: bool,
+    pub exit_on_termination: bool,
+    pub watchdog_command: Option<&'a str>,
 }
 /// An owning robot connection. Share with `Arc` when using several threads.
 pub struct Robot(NonNull<ffi::dex_robot_t>);
 impl Robot {
     pub fn connect(options: ConnectOptions<'_>) -> Result<Self> {
-        let abi = unsafe { ffi::dex_abi_version() };
-        if abi != ffi::EXPECTED_ABI_VERSION {
-            return Err(invalid(
-                "DexControl runtime ABI mismatch; install the matching SDK",
-            ));
-        }
-        if options.profile.is_some() && options.config_file.is_some() {
-            return Err(invalid("Choose profile or config_file, not both"));
-        }
-        let profile = options.profile.map(string).transpose()?;
-        let config = options.config_file.map(string).transpose()?;
-        let mut native = ffi::dex_robot_options_t::default();
-        call(|_| unsafe { ffi::dex_robot_options_init(&mut native) })?;
-        native.profile_utf8 = profile.as_ref().map_or(ptr::null(), |s| s.as_ptr());
-        native.config_file_utf8 = config.as_ref().map_or(ptr::null(), |s| s.as_ptr());
-        native.simulated = u8::from(options.simulated);
-        let mut out = ptr::null_mut();
-        let result = call(|error| unsafe { ffi::dex_robot_create(&native, &mut out, error) });
-        if let Err(error) = result {
-            if !out.is_null() {
-                unsafe { ffi::dex_robot_release(out) };
+        options.with_native(|native| {
+            let mut out = ptr::null_mut();
+            let result = call(|error| unsafe { ffi::dex_robot_create(native, &mut out, error) });
+            if let Err(error) = result {
+                if !out.is_null() {
+                    unsafe { ffi::dex_robot_release(out) };
+                }
+                return Err(error);
             }
-            return Err(error);
-        }
-        Ok(Self(
-            NonNull::new(out).ok_or_else(|| invalid("Runtime returned no robot"))?,
-        ))
+            Ok(Self(
+                NonNull::new(out).ok_or_else(|| invalid("Runtime returned no robot"))?,
+            ))
+        })
     }
     pub fn simulated(profile: &str) -> Result<Self> {
         Self::connect(ConnectOptions {
@@ -370,15 +380,7 @@ impl MotionHandle {
     pub fn state(&self) -> Result<MotionState> {
         let mut state = 0;
         call(|_| unsafe { ffi::dex_motion_state(self.0.as_ptr(), &mut state) })?;
-        Ok(match state {
-            0 => MotionState::Pending,
-            1 => MotionState::Running,
-            2 => MotionState::Succeeded,
-            3 => MotionState::Cancelled,
-            4 => MotionState::Failed,
-            5 => MotionState::Superseded,
-            other => MotionState::Unknown(other),
-        })
+        Ok(MotionState::from_native(state))
     }
 }
 impl Drop for MotionHandle {
