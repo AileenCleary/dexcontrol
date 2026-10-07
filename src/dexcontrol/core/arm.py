@@ -867,6 +867,16 @@ class ArmWrenchSensor(RobotComponent):
         button_state = self.get_button_state()
         return dict(wrench=wrench_state, **button_state)
 
+    def get_timestamp_ns(self) -> int:
+        """Timestamp (ns) of the most recent wrench state message.
+        ``ArmWrenchSensor`` overrides ``get_state()`` to bundle wrench values
+        with button state, which drops the raw message's ``timestamp_ns``; the
+        inherited ``RobotComponent.get_timestamp_ns()`` would therefore raise
+        ``KeyError: 'timestamp_ns'``. Read the timestamp from the raw wrench
+        state message instead.
+        """
+        return int(super().get_state()["timestamp_ns"])
+    
     def get_blue_button_state(self) -> bool:
         """Get the state of the blue button.
 
