@@ -240,7 +240,7 @@ class Head(ManagedJointComponent):
         # Wait for service to be available before calling
         if not self._mode_querier.wait_for_service(timeout=5.0):
             logger.warning(
-                f"{self._node.get_name()}: Mode service not available, command may fail"
+                f"{self._node.name()}: Mode service not available, command may fail"
             )
 
         self._mode_querier.call(query_msg)

@@ -307,7 +307,7 @@ class EStop(RobotComponent):
         # Wait for service to be available
         if not self._estop_querier.wait_for_service(timeout=5.0):
             logger.warning(
-                f"{self._node.get_name()}: E-Stop service not available, command may fail"
+                f"{self._node.name()}: E-Stop service not available, command may fail"
             )
 
         query_msg = {"enabled": enable}

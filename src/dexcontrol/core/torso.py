@@ -216,7 +216,7 @@ class Torso(ManagedJointComponent):
         """
         if not self._idle_mode_querier.wait_for_service(timeout=5.0):
             logger.warning(
-                f"{self._node.get_name()}: torso idle-mode service not "
+                f"{self._node.name()}: torso idle-mode service not "
                 "available, command may fail"
             )
         self._idle_mode_querier.call({"enabled": enabled})
@@ -231,7 +231,7 @@ class Torso(ManagedJointComponent):
         """
         if not self._idle_mode_querier.wait_for_service(timeout=5.0):
             logger.warning(
-                f"{self._node.get_name()}: torso idle-mode service not available"
+                f"{self._node.name()}: torso idle-mode service not available"
             )
             return None
         response = self._idle_mode_querier.call(None)
